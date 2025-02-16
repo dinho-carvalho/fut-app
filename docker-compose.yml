@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: futebol_stats_app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=db
+      - DB_USER=admin
+      - DB_PASSWORD=admin
+      - DB_NAME=futebol_stats
+      - DB_PORT=5432
+    depends_on:
+      - db
+    networks:
+      - futebol_network
+
+  db:
+    image: postgres:15-alpine
+    container_name: futebol_stats_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: futebol_stats
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d futebol_stats"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - futebol_network
+
+networks:
+  futebol_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
