@@ -23,7 +23,7 @@ Ou, manualmente:
 ```sh
 docker-compose up -d
 ```
-Se preferir rodar o PostgreSQL localmente, crie um banco de dados:
+Se preferir rodar o PostgreSQL localmente:
 ```sh
 docker run --name futebol-db -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=admin -e POSTGRES_DB=futebol_stats -p 5432:5432 -d postgres
 ```
@@ -43,11 +43,6 @@ DB_NAME=futebol_stats
 ### **4️⃣ Instalar Dependências**
 ```sh
 go mod tidy
-```
-
-### **5️⃣ Rodar Migrações**
-```sh
-go run main.go migrate
 ```
 
 ### **6️⃣ Rodar a Aplicação**
@@ -89,24 +84,4 @@ gofumpt -w .
 
 ---
 
-## 🛠️ Estrutura do Projeto
-```
-/project-root
- ├── cmd/              # Entrada principal da aplicação
- ├── config/           # Configurações e variáveis de ambiente
- ├── models/           # Modelos do banco de dados
- ├── repositories/     # Camada de acesso aos dados
- ├── services/         # Lógica de negócio
- ├── handlers/         # Controllers e rotas
- ├── migrations/       # Scripts de migração do banco
- ├── .env.example      # Exemplo do arquivo .env
- ├── Dockerfile        # Configuração Docker
- ├── docker-compose.yml# Configuração Docker Compose
- ├── Makefile          # Comandos úteis
- ├── README.md         # Documentação do projeto
-```
-
 ---
-
-Sempre que algo for alterado no setup do projeto, este README deve ser atualizado! 🚀
-
