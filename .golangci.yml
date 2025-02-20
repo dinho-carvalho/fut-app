@@ -1,0 +1,41 @@
+# .golangci.yml
+linters:
+  enable:
+    - govet        # Analisa código para construções suspeitas
+    - errcheck     # Verifica erros não tratados
+    - staticcheck  # Análise estática avançada
+    - gosimple     # Simplificações de código
+    - goconst      # Encontra constantes que poderiam ser declaradas
+    - gofmt        # Verifica formatação
+    - goimports    # Verifica e corrige imports
+    - misspell     # Verifica erros de ortografia
+    - gosec        # Verifica problemas de segurança
+    - revive       # Linter estilístico, substituto do golint
+    - bodyclose    # Verifica se os corpos de resposta HTTP são fechados
+    - dupl         # Verifica código duplicado
+    - gocritic     # Várias verificações de estilo e boas práticas
+
+linters-settings:
+  govet:
+    check-shadowing: true
+  golint:
+    min-confidence: 0
+  goconst:
+    min-len: 3
+    min-occurrences: 3
+  gosec:
+    excludes:
+      - G404  # Insecure random number source (math/rand)
+
+run:
+  deadline: 5m
+  tests: true
+  skip-dirs:
+    - vendor/
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gosec
+        - dupl
