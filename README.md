@@ -83,5 +83,6 @@ gofumpt -w .
 ```
 
 ---
-
+![Go CI/CD](https://github.com/dinho-carvalho/fut-app/workflows/Go%20CI%20CD/badge.svg)
+[![codecov](https://codecov.io/gh/dinho-carvalho/fut-app/branch/main/graph/badge.svg)](https://codecov.io/gh/dinho-carvalhho/fut-app)
 ---

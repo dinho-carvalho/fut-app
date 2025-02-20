@@ -28,10 +28,13 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: '1.24'
           cache: true
@@ -55,17 +58,19 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          go test -race -coverprofile=coverage.out -covermode=atomic ./...
-          go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//' > coverage_total.txt
+          go test -race -coverprofile=coverage.txt -covermode=atomic ./...
+          go tool cover -func=coverage.txt | grep total | awk '{print $3}' | sed 's/%//' > coverage_total.txt
           if (( $(echo "$(cat coverage_total.txt) < 95" | bc -l) )); then
             echo "Test coverage ($(cat coverage_total.txt)%) is below threshold (95%)"
             exit 1
           fi
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+      - name: Upload results to Codecov
+        uses: codecov/codecov-action@v5
         with:
-          file: ./coverage.out
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: dinho-carvalho/fut-app
+          file: ./coverage.txt
           fail_ci_if_error: true
 
   build:
@@ -73,10 +78,10 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: '1.24'
 
