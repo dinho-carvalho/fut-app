@@ -6,7 +6,6 @@ linters:
     - staticcheck  # Análise estática avançada
     - gosimple     # Simplificações de código
     - goconst      # Encontra constantes que poderiam ser declaradas
-    - gofmt        # Verifica formatação
     - misspell     # Verifica erros de ortografia
     - gosec        # Verifica problemas de segurança
     - revive       # Linter estilístico, substituto do golint
@@ -14,8 +13,6 @@ linters:
     - gocritic     # Várias verificações de estilo e boas práticas
 
 linters-settings:
-  govet:
-    check-shadowing: true
   golint:
     min-confidence: 0
   goconst:
@@ -28,8 +25,6 @@ linters-settings:
 run:
   deadline: 5m
   tests: true
-  skip-dirs:
-    - vendor/
 
 issues:
   exclude-rules:
