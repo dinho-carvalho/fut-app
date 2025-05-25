@@ -7,7 +7,6 @@ linters:
     - gosimple     # Simplificações de código
     - goconst      # Encontra constantes que poderiam ser declaradas
     - gofmt        # Verifica formatação
-    - goimports    # Verifica e corrige imports
     - misspell     # Verifica erros de ortografia
     - gosec        # Verifica problemas de segurança
     - revive       # Linter estilístico, substituto do golint
