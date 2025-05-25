@@ -18,9 +18,9 @@ type (
 	}
 )
 
-func NewRating(DB *gorm.DB) RatingRepository {
+func NewRating(db *gorm.DB) RatingRepository {
 	return &ratingRepository{
-		db: DB,
+		db: db,
 	}
 }
 

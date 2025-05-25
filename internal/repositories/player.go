@@ -18,9 +18,9 @@ type (
 	}
 )
 
-func NewPlayer(DB *gorm.DB) PlayerRepository {
+func NewPlayer(db *gorm.DB) PlayerRepository {
 	return &playerRepository{
-		db: DB,
+		db: db,
 	}
 }
 

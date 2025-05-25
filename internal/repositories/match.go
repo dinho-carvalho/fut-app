@@ -18,9 +18,9 @@ type (
 	}
 )
 
-func NewMatch(DB *gorm.DB) MatchRepository {
+func NewMatch(db *gorm.DB) MatchRepository {
 	return &matchRepository{
-		db: DB,
+		db: db,
 	}
 }
 
