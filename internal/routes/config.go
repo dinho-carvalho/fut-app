@@ -31,7 +31,7 @@ func players(r *mux.Router, db *database.Database) {
 	r.HandleFunc("/players/{id:[0-9]+}", playerHandler.DeletePlayer).Methods("DELETE")
 }
 
-func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
+func HealthCheckHandler(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintln(w, "OK")
 }

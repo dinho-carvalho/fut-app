@@ -79,7 +79,7 @@ func (db *Database) Execute(ctx context.Context, operation func(tx *gorm.DB) err
 }
 
 // shouldRetry verifica se deve tentar novamente baseado no erro
-func (db *Database) shouldRetry(err error) bool {
+func (db *Database) shouldRetry(_ error) bool {
 	// Adicione aqui condições para retry baseadas nos erros
 	// Por exemplo, deadlocks, timeouts, etc.
 	return false
