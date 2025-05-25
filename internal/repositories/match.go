@@ -24,26 +24,26 @@ func NewMatch(db *gorm.DB) MatchRepository {
 	}
 }
 
-func (p *matchRepository) CreateMatch(player models.Match) error {
-	return p.db.Create(&player).Error
+func (p *matchRepository) CreateMatch(m models.Match) error {
+	return p.db.Create(&m).Error
 }
 
 func (p *matchRepository) GetMatches() []models.Match {
-	var players []models.Match
-	p.db.Find(&players)
+	var m []models.Match
+	p.db.Find(&m)
 
-	return players
+	return m
 }
 
 func (p *matchRepository) GetMatchByID(id int) (models.Match, error) {
-	var player models.Match
-	err := p.db.First(&player, id).Error
+	var m models.Match
+	err := p.db.First(&m, id).Error
 
-	return player, err
+	return m, err
 }
 
-func (p *matchRepository) UpdateMatch(player models.Match) error {
-	return p.db.Save(&player).Error
+func (p *matchRepository) UpdateMatch(m models.Match) error {
+	return p.db.Save(&m).Error
 }
 
 func (p *matchRepository) DeleteMatch(id int) error {

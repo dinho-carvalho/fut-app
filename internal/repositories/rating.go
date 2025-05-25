@@ -29,10 +29,10 @@ func (r *ratingRepository) CreateRating(rating models.Rating) error {
 }
 
 func (r *ratingRepository) GetRatings() []models.Rating {
-	var rating []models.Rating
-	r.db.Find(&rating)
+	var rs []models.Rating
+	r.db.Find(&rs)
 
-	return rating
+	return rs
 }
 
 func (r *ratingRepository) GetRatingByID(id int) (models.Rating, error) {
