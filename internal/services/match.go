@@ -25,8 +25,8 @@ func (s *MatchService) GetMatchByID(id int) (models.Match, error) {
 	return s.repo.GetMatchByID(id)
 }
 
-func (s *MatchService) UpdateMatch(Match models.Match) error {
-	return s.repo.UpdateMatch(Match)
+func (s *MatchService) UpdateMatch(match models.Match) error {
+	return s.repo.UpdateMatch(match)
 }
 
 func (s *MatchService) DeleteMatch(id int) error {
