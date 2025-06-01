@@ -32,8 +32,7 @@ type PaginatedResult struct {
 // Método auxiliar para paginação
 func (db *Database) Paginate(ctx context.Context, model interface{}, opts QueryOptions) (*PaginatedResult, error) {
 	var total int64
-	query := db.WithContext(ctx).Model(model)
-
+	query := db.WithContext(ctx).DB.Model(model)
 	//if opts.Search != "" {
 	// TODO implement pagination logic
 	//}
