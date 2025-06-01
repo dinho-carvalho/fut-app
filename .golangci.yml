@@ -7,10 +7,6 @@ linters-settings:
   errcheck:
     check-type-assertions: true
     check-blank: true
-  # govet:
-  #   check-shadowing: true # Removido, pois está obsoleto
-  gofumpt:
-    extra-rules: true
   unused:
     check-exported: false
 
@@ -20,8 +16,6 @@ linters:
     - errcheck
     - unused
     - staticcheck
-    # - shadow # Removido pois não está disponível nesta versão
-
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0

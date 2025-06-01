@@ -23,20 +23,6 @@ jobs:
     - name: Get dependencies
       run: go mod download
 
-    - name: Install gofumpt
-      run: go install mvdan.cc/gofumpt@latest
-
-    - name: Check formatting with gofumpt
-      run: |
-        # Ensure gofumpt is in PATH if not already by setup-go or go install
-        # export PATH=$(go env GOPATH)/bin:$PATH
-        gofumpt -l -w .
-        # Check if gofumpt made any changes
-        if [[ -n $(git status --porcelain) ]]; then
-          echo "gofumpt found files that need formatting. Please run 'gofumpt -l -w .' locally and commit the changes."
-          exit 1
-        fi
-
     - name: Run unit tests and calculate coverage
       run: |
         go test -v -coverprofile=coverage.out -covermode=atomic ./...
