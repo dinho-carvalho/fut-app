@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"fut-app/internal/database/models"
-
 	"gorm.io/gorm"
 )
 

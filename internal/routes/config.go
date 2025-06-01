@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
-	"fut-app/internal/database"
-	"fut-app/internal/handlers"
 	"fut-app/internal/repositories"
 	"fut-app/internal/services"
 
+	"fut-app/internal/handlers"
+
+	"fut-app/internal/database"
 	"github.com/gorilla/mux"
 )
 

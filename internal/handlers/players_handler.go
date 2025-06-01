@@ -6,8 +6,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"fut-app/internal/database/models"
 	"fut-app/internal/services"
+
+	"fut-app/internal/database/models"
 
 	"github.com/gorilla/mux"
 )
@@ -29,20 +30,12 @@ func (h *PlayerHandler) CreatePlayer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	err = json.NewEncoder(w).Encode(player)
-	if err != nil {
-		http.Error(w, "Failed to encode player", http.StatusInternalServerError)
-		return
-	}
+	_ = json.NewEncoder(w).Encode(player)
 }
 
 func (h *PlayerHandler) GetPlayers(w http.ResponseWriter, r *http.Request) {
 	players := h.Service.GetAllPlayers()
-	err := json.NewEncoder(w).Encode(players)
-	if err != nil {
-		http.Error(w, "Failed to encode players", http.StatusInternalServerError)
-		return
-	}
+	_ = json.NewEncoder(w).Encode(players)
 }
 
 func (h *PlayerHandler) GetPlayerByID(w http.ResponseWriter, r *http.Request) {
@@ -59,11 +52,7 @@ func (h *PlayerHandler) GetPlayerByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(player)
-	if err != nil {
-		http.Error(w, "Failed to encode player", http.StatusInternalServerError)
-		return
-	}
+	_ = json.NewEncoder(w).Encode(player)
 }
 
 func (h *PlayerHandler) UpdatePlayer(w http.ResponseWriter, r *http.Request) {
@@ -83,11 +72,7 @@ func (h *PlayerHandler) UpdatePlayer(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to update player", http.StatusInternalServerError)
 		return
 	}
-	err = json.NewEncoder(w).Encode(player)
-	if err != nil {
-		http.Error(w, "Failed to encode player", http.StatusInternalServerError)
-		return
-	}
+	_ = json.NewEncoder(w).Encode(player)
 }
 
 func (h *PlayerHandler) DeletePlayer(w http.ResponseWriter, r *http.Request) {

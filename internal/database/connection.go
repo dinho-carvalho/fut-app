@@ -52,16 +52,9 @@ func NewDatabase(config *Config) (*Database, error) {
 	return &Database{db}, nil
 }
 
-// WithContext retorna uma cópia do DB com o contexto especificado
-func (db *Database) WithContext(ctx context.Context) *Database {
-	return &Database{
-		DB: db.DB.WithContext(ctx),
-	}
-}
-
 // Transaction executa uma função dentro de uma transação
 func (db *Database) Transaction(ctx context.Context, fn func(tx *gorm.DB) error) error {
-	return db.WithContext(ctx).DB.Transaction(fn)
+	return db.WithContext(ctx).Transaction(fn)
 }
 
 // Execute executa uma operação de banco de dados com retry em caso de erro
@@ -70,7 +63,7 @@ func (db *Database) Execute(ctx context.Context, operation func(tx *gorm.DB) err
 	var err error
 
 	for i := 0; i < maxRetries; i++ {
-		err = operation(db.WithContext(ctx).DB)
+		err = operation(db.WithContext(ctx))
 		if err == nil {
 			return nil
 		}
@@ -86,7 +79,7 @@ func (db *Database) Execute(ctx context.Context, operation func(tx *gorm.DB) err
 }
 
 // shouldRetry verifica se deve tentar novamente baseado no erro
-func (db *Database) shouldRetry(_ error) bool {
+func (db *Database) shouldRetry(err error) bool {
 	// Adicione aqui condições para retry baseadas nos erros
 	// Por exemplo, deadlocks, timeouts, etc.
 	return false
@@ -97,7 +90,7 @@ func (db *Database) Batch(ctx context.Context, batchSize int, model interface{},
 	var offset int
 	for {
 		var batch []interface{}
-		result := db.WithContext(ctx).DB.
+		result := db.WithContext(ctx).
 			Model(model).
 			Offset(offset).
 			Limit(batchSize).
@@ -122,7 +115,7 @@ func (db *Database) Batch(ctx context.Context, batchSize int, model interface{},
 
 // SafeDelete realiza uma deleção segura (soft delete)
 func (db *Database) SafeDelete(ctx context.Context, model interface{}, conditions ...interface{}) error {
-	return db.WithContext(ctx).DB.Delete(model, conditions...).Error
+	return db.WithContext(ctx).Delete(model, conditions...).Error
 }
 
 // Health verifica a saúde da conexão com o banco

@@ -14,11 +14,6 @@ Antes de começar, você precisará ter instalado:
 - **Make** (opcional, para rodar comandos mais facilmente)
 - **gofumpt** (para manter o padrão de formatação do código)
 
-## 🔧 Pré-commit com gofumpt + golangci-lint
-
-Este projeto usa `pre-commit` para manter o código limpo e padronizado com `gofumpt` e `golangci-lint`.
-
-
 ### **2️⃣ Configurar Projeto**
 Se estiver utilizando Docker, basta rodar:
 ```sh
@@ -99,7 +94,7 @@ This project uses GitHub Actions for its CI/CD pipeline. The workflow is defined
 2.  **Checkout Code**: Checks out the repository's code.
 3.  **Download Dependencies**: Fetches the necessary Go modules.
 4.  **Code Formatting**: Uses `gofumpt` to ensure consistent code style. The build will fail if any files need reformatting.
-5.  **Linting**: Employs `golangci-lint` with the configurations defined in `.golangci.yml` to perform static analysis and identify potential issues.
+5.  **Linting**: A dedicated GitHub Actions workflow (`.github/workflows/golangci-lint.yml`) employs `golangci-lint` with the configurations defined in `.golangci.yml` to perform static analysis and identify potential issues.
 6.  **Unit Testing & Coverage**: Runs all unit tests using `go test`. It also calculates code coverage and aims for a target of 98%. (Note: Test coverage enforcement will be active once tests are implemented).
 7.  **Build**: Compiles the application using `go build`.
 

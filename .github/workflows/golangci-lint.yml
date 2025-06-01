@@ -1,0 +1,54 @@
+name: golangci-lint
+
+on:
+  push:
+    branches:
+      - main # Or your default branch
+  pull_request:
+    branches:
+      - main # Or your default branch
+
+permissions:
+  contents: read
+  # Optional: write permission to publish comments or status checks
+  # pull-requests: write
+  # checks: write
+
+jobs:
+  golangci:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.20' # Ensure this matches your project's Go version
+          check-latest: true # Optional: use the latest patch version of Go
+
+      # - name: Get dependencies # Often not needed for linting if linters don't require full build context
+      #   run: go mod download # Uncomment if your linters need dependencies
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v3 # Changed to v3 as it's the latest GA
+        with:
+          # Required: the version of golangci-lint is required and must be specified without patch version: we always use the latest patch version.
+          version: v1.55 # Or the specific version you configured in .golangci.yml or prefer
+
+          # Optional: working directory, useful for monorepos
+          # working-directory: internal
+
+          # Optional: golangci-lint command line arguments.
+          # These args will be appended to the default command: `run --out-format=github-actions ./...`
+          # E.g., to run only specific linters:
+          # args: --disable-all --enable=errcheck,gofmt,govet,ineffassign,unused
+          # Or to specify a custom config file path:
+          # args: --config=.golangci.another.yml
+          args: --timeout=5m
+
+          # Optional: if set to true, then the action will not fail on linting errors
+          # skip-cache: true # Default is false
+          # skip-pkg-cache: true # Default is false
+          # skip-build-cache: true # Default is false
