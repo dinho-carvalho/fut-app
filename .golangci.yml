@@ -1,73 +1,43 @@
 run:
   timeout: 5m
-  skip-dirs:
-    - vendor/
-    - internal/database/migrations # Assuming migrations might be auto-generated or less critical to lint initially
 
 linters-settings:
   errcheck:
-    # Report about not checking of errors in type assertions: `a := b.(MyStruct)`;
-    # default is false
     check-type-assertions: true
-    # Report about assignment of errors to blank identifier: `num, _ := strconv.Atoi(numStr)`;
-    # default is false
     check-blank: true
-  govet:
-    # Report about shadowed variables
-    check-shadowing: true
-  gofumpt:
-    # Options for gofumpt
-    extra-rules: true
+  #gofumpt:
+   # extra-rules: true
   unused:
-    # Report about unused constants
     check-exported: false
 
 linters:
   enable:
     - gofmt
-    - gofumpt
     - govet
     - errcheck
     - unused
-    - typecheck # Fast type checking
-    - staticcheck # More advanced static analysis
-    - gosimple # Simplifies code
-    - stylecheck # Style checking
-  # Disable all linters by default and enable only specific ones
-  # disable-all: true
-  # enable:
-  #   - errcheck
-  #   - gosimple
-  #   - govet
-  #   - unused
-  #   - staticcheck
-  #   - typecheck
+    - typecheck
+    - staticcheck
+    - gosimple
+    - stylecheck
 
 issues:
-  # Maximum issues count per linter. Set to 0 to disable. Default is 50.
   max-issues-per-linter: 0
-  # Maximum count of issues with the same text. Set to 0 to disable. Default is 3.
   max-same-issues: 0
+  exclude-dirs:
+    - vendor/
+    - internal/database/migrations
   exclude-rules:
-    # Exclude some linters from running on test files.
     - path: _test\.go
       linters:
-        - errcheck # Often errors are intentionally ignored in tests for brevity
-        - govet # Can be noisy in tests
-    # Example of excluding a specific rule for a specific path
-    # - path: internal/legacy/code.go
-    #   text: "SA1019: package is deprecated" # Specific message to ignore
-    #   linters:
-    #     - staticcheck
+        - errcheck
+        - govet
 
-# Optional: Output format
 output:
   formats:
-    - colored-line-number
+    - format: colored-line-number
   print-issued-lines: true
   print-linter-name: true
 
-# Optional: Reporting settings
 report:
-  # Show statistics about found issues.
   metrics: true

@@ -1,0 +1,12 @@
+repos:
+  - repo: https://github.com/mvdan/gofumpt
+    rev: v0.6.0
+    hooks:
+      - id: gofumpt
+        args: ["-l", "-w", "."]
+
+  - repo: https://github.com/golangci/golangci-lint
+    rev: v1.58.2
+    hooks:
+      - id: golangci-lint
+        args: ["run", "--fix"]

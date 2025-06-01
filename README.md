@@ -14,6 +14,11 @@ Antes de começar, você precisará ter instalado:
 - **Make** (opcional, para rodar comandos mais facilmente)
 - **gofumpt** (para manter o padrão de formatação do código)
 
+## 🔧 Pré-commit com gofumpt + golangci-lint
+
+Este projeto usa `pre-commit` para manter o código limpo e padronizado com `gofumpt` e `golangci-lint`.
+
+
 ### **2️⃣ Configurar Projeto**
 Se estiver utilizando Docker, basta rodar:
 ```sh

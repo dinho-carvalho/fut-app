@@ -5,12 +5,11 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
-
-	"fut-app/internal/routes"
-
 	"fut-app/internal/database"
 	"fut-app/internal/database/models"
+	"fut-app/internal/routes"
+
+	"github.com/gorilla/mux"
 )
 
 func main() {
