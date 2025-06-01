@@ -35,7 +35,7 @@ jobs:
         uses: golangci/golangci-lint-action@v3 # Changed to v3 as it's the latest GA
         with:
           # Required: the version of golangci-lint is required and must be specified without patch version: we always use the latest patch version.
-          version: v1.55 # Or the specific version you configured in .golangci.yml or prefer
+          version: v2 # Or the specific version you configured in .golangci.yml or prefer
 
           # Optional: working directory, useful for monorepos
           # working-directory: internal

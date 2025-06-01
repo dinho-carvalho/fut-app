@@ -1,3 +1,4 @@
+version: 2
 run:
   timeout: 5m
   # A propriedade `skip-dirs` foi movida para `issues.exclude-dirs` para melhor organização e alinhamento com as práticas recomendadas.
