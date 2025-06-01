@@ -89,5 +89,5 @@ func (h *PlayerHandler) DeletePlayer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-	fmt.Fprintln(w, "✅ Player deleted successfully")
+	fmt.Println(w, "✅ Player deleted successfully")
 }
