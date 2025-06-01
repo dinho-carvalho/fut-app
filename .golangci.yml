@@ -35,9 +35,7 @@ issues:
 
 output:
   formats:
-    - format: json
-  print-issued-lines: true
-  print-linter-name: true
+    json: true
 
 report:
   metrics: true
