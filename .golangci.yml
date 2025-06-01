@@ -1,25 +1,16 @@
-version: 2 # Adiciona a versão do arquivo de configuração
-
 run:
   timeout: 5m
-  # A propriedade `skip-dirs` foi movida para `issues.exclude-dirs` para melhor organização e alinhamento com as práticas recomendadas na versão 2.
+  # A propriedade `skip-dirs` foi movida para `issues.exclude-dirs` para melhor organização e alinhamento com as práticas recomendadas.
 
 linters-settings:
   errcheck:
-    # Report about not checking of errors in type assertions: `a := b.(MyStruct)`;
-    # default is false
     check-type-assertions: true
-    # Report about assignment of errors to blank identifier: `num, _ := strconv.Atoi(numStr)`;
-    # default is false
     check-blank: true
   govet:
-    # Report about shadowed variables
     check-shadowing: true
   gofumpt:
-    # Options for gofumpt
     extra-rules: true
   unused:
-    # Report about unused constants
     check-exported: false
 
 linters:
@@ -30,35 +21,16 @@ linters:
     - staticcheck
 
 issues:
-  # Maximum issues count per linter. Set to 0 to disable. Default is 50.
   max-issues-per-linter: 0
-  # Maximum count of issues with the same text. Set to 0 to disable. Default is 3.
   max-same-issues: 0
-  # Diretórios a serem completamente excluídos do linting.
-  # Esta é a localização recomendada para 'vendor/' e diretórios de migração.
   exclude-dirs:
     - vendor/
     - internal/database/migrations
   exclude-rules:
-    # Exclude some linters from running on test files.
     - path: _test\.go
       linters:
-        - errcheck # Often errors are intentionally ignored in tests for brevity
-        - govet # Can be noisy in tests
-    # Example of excluding a specific rule for a specific path
-    # - path: internal/legacy/code.go
-    #   text: "SA1019: package is deprecated" # Specific message to ignore
-    #   linters:
-    #     - staticcheck
+        - errcheck
+        - govet
 
-
-# Optional: Reporting settings
 report:
-  # Show statistics about found issues.
   metrics: true
-
-# Se você quiser alguma configuração de output, adicione aqui como discutido anteriormente:
-# output:
-#   formats:
-#     - format: json
-#       path: golangci-lint-report.json
