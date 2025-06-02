@@ -86,6 +86,18 @@ gofumpt -w .
 
 ---
 
+## Local Development
+
+### Generating Test Coverage Report
+
+To generate an HTML report of your unit test coverage locally, run the following Make command:
+
+```bash
+make coverage-html
+```
+
+This will execute the tests, calculate coverage, and create a `coverage.html` file in the project root. You can open this file in your web browser to view the detailed coverage report.
+
 ## CI/CD Pipeline
 
 This project uses GitHub Actions for its CI/CD pipeline. The workflow is defined in `.github/workflows/go.yml` and includes the following stages:
@@ -93,9 +105,8 @@ This project uses GitHub Actions for its CI/CD pipeline. The workflow is defined
 1.  **Setup Go**: Initializes the Go environment.
 2.  **Checkout Code**: Checks out the repository's code.
 3.  **Download Dependencies**: Fetches the necessary Go modules.
-4.  **Code Formatting**: Uses `gofumpt` to ensure consistent code style. The build will fail if any files need reformatting.
-5.  **Linting**: A dedicated GitHub Actions workflow (`.github/workflows/golangci-lint.yml`) employs `golangci-lint` with the configurations defined in `.golangci.yml` to perform static analysis and identify potential issues.
-6.  **Unit Testing & Coverage**: Runs all unit tests using `go test`. It also calculates code coverage and aims for a target of 98%. (Note: Test coverage enforcement will be active once tests are implemented).
-7.  **Build**: Compiles the application using `go build`.
+4.  **Linting**: A dedicated GitHub Actions workflow (`.github/workflows/golangci-lint.yml`) employs `golangci-lint` with the configurations defined in `.golangci.yml` to perform static analysis and identify potential issues.
+5.  **Unit Testing & Coverage**: Runs all unit tests using `go test`. It also calculates code coverage and **enforces a 98% minimum threshold**. The pipeline will fail if coverage is below this target.
+6.  **Build**: Compiles the application using `go build`.
 
 This pipeline helps maintain code quality and ensures that the application builds correctly with every push and pull request to the `main` branch.

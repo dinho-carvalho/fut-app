@@ -25,17 +25,19 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: '1.24' # Ensure this matches your project's Go version
+          go-version: '1.21' # Ensure this matches your project's Go version
           check-latest: true # Optional: use the latest patch version of Go
 
       # - name: Get dependencies # Often not needed for linting if linters don't require full build context
       #   run: go mod download # Uncomment if your linters need dependencies
 
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v3 # Changed to v3 as it's the latest GA
+        uses: golangci/golangci-lint-action@v3 # Using v3 for latest stable action
         with:
-          # Required: the version of golangci-lint is required and must be specified without patch version: we always use the latest patch version.
-          version: v1.57.2 # Or the specific version you configured in .golangci.yml or prefer
+          # version: v1.55 # Removed to use the action's default latest golangci-lint version
+          args: --timeout=5m
+          # Optional: Enable if you want to ensure the action uses the .golangci.yml from the repo
+          # config-file: .golangci.yml
 
           # Optional: working directory, useful for monorepos
           # working-directory: internal

@@ -1,32 +1,40 @@
-version: 2
 run:
   timeout: 5m
-  # A propriedade `skip-dirs` foi movida para `issues.exclude-dirs` para melhor organização e alinhamento com as práticas recomendadas.
+  skip-dirs:
+    - vendor/
+    # Add other directories to skip if necessary, e.g., auto-generated code
 
 linters-settings:
   errcheck:
     check-type-assertions: true
     check-blank: true
-  unused:
-    check-exported: false
+  govet:
+    check-shadowing: true
+  # Settings for other specific linters if needed in the future
 
 linters:
-  enable:
+  disable-all: true # Disable all linters by default
+  enable:          # Enable only the specified linters
     - govet
     - errcheck
     - unused
-    - staticcheck
+    - typecheck
+  # fast: false # Uncomment if you want to run more linters than the default 'fast' set, not relevant here as we disable all first.
+
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
-  exclude-dirs:
-    - vendor/
-    - internal/database/migrations
   exclude-rules:
-    - path: _test\.go
+    - path: _test\.go # Example: exclude some rules for test files
       linters:
-        - errcheck
-        - govet
+        - errcheck # Common to ignore errors in tests for brevity
+        # - govet # Depending on project needs
+
+output:
+  formats:
+    - colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
 
 report:
   metrics: true

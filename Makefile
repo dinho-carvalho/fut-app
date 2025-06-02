@@ -1,4 +1,4 @@
-.PHONY: run db-up db-down migrate fmt test clean
+.PHONY: run db-up db-down migrate fmt test clean coverage-html
 
 # Roda a aplicação
 run:
@@ -23,6 +23,13 @@ fmt:
 # Roda os testes
 test:
 	go test ./...
+
+# Generates an HTML coverage report
+coverage-html:
+	@echo "Generating HTML coverage report..."
+	@go test -coverprofile=coverage.out -covermode=atomic ./...
+	@go tool cover -html=coverage.out -o coverage.html
+	@echo "HTML coverage report generated: coverage.html"
 
 # Limpa o cache e dependências antigas
 clean:

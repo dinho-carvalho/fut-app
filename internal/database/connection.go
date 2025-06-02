@@ -17,11 +17,6 @@ type Database struct {
 	*gorm.DB
 }
 
-// Adiciona o método WithContext para compatibilidade
-func (db *Database) WithContext(ctx context.Context) *gorm.DB {
-	return db.DB.WithContext(ctx)
-}
-
 func NewDatabase(config *Config) (*Database, error) {
 	gormLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags),

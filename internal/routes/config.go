@@ -33,5 +33,5 @@ func players(r *mux.Router, db *database.Database) {
 
 func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	fmt.Println(w, "OK")
+	fmt.Fprintln(w, "OK")
 }
