@@ -1,104 +1,253 @@
 package services
 
 import (
+	"errors"
 	"testing"
 
 	"fut-app/internal/database/models"
-	// "fut-app/internal/repositories" // Not strictly needed for type compilation with nil repo
+	"fut-app/internal/repositories/mocks"
 )
 
 // TestRatingService_CreateRating tests CreateRating with a nil repository.
 func TestRatingService_CreateRating(t *testing.T) {
-	service := NewRatingService(nil) // Initialize with nil repository
-	rating := models.Rating{}       // Zero-value model
-
-	defer func() {
-		if r := recover(); r != nil {
-			t.Logf("CreateRating panicked as expected with nil repo: %v", r)
-		} else {
-			t.Errorf("CreateRating did not panic with nil repo")
-		}
-	}()
-
-	err := service.CreateRating(rating) // Expect panic
-	if err == nil && recover() == nil {
-		t.Errorf("CreateRating: expected panic or error with nil repo, got nil error and no panic")
+	tests := []struct {
+		name    string
+		rating  models.Rating
+		mockFn  func(mock *mocks.RatingRepositoryMock)
+		wantErr bool
+	}{
+		{
+			name: "success",
+			rating: models.Rating{
+				MatchID:       1,
+				PlayerID:      1,
+				RatedPlayerID: 2,
+				Finishing:     80,
+			},
+			mockFn: func(mock *mocks.RatingRepositoryMock) {
+				mock.CreateRatingFunc = func(rating models.Rating) error {
+					return nil
+				}
+			},
+			wantErr: false,
+		},
+		{
+			name: "database error",
+			rating: models.Rating{
+				MatchID:       1,
+				PlayerID:      1,
+				RatedPlayerID: 2,
+				Finishing:     80,
+			},
+			mockFn: func(mock *mocks.RatingRepositoryMock) {
+				mock.CreateRatingFunc = func(rating models.Rating) error {
+					return errors.New("database error")
+				}
+			},
+			wantErr: true,
+		},
 	}
-	t.Log("TestRatingService_CreateRating executed (placeholder, expecting panic)")
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := &mocks.RatingRepositoryMock{}
+			tt.mockFn(mockRepo)
+			service := NewRatingService(mockRepo)
+
+			err := service.CreateRating(tt.rating)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("CreateRating() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
 }
 
 // TestRatingService_GetAllRatings tests GetAllRatings with a nil repository.
 func TestRatingService_GetAllRatings(t *testing.T) {
-	service := NewRatingService(nil)
+	tests := []struct {
+		name     string
+		mockFn   func(mock *mocks.RatingRepositoryMock)
+		expected []models.Rating
+	}{
+		{
+			name: "success with ratings",
+			mockFn: func(mock *mocks.RatingRepositoryMock) {
+				mock.GetRatingsFunc = func() []models.Rating {
+					return []models.Rating{{MatchID: 1, PlayerID: 1}}
+				}
+			},
+			expected: []models.Rating{{MatchID: 1, PlayerID: 1}},
+		},
+		{
+			name: "empty list",
+			mockFn: func(mock *mocks.RatingRepositoryMock) {
+				mock.GetRatingsFunc = func() []models.Rating {
+					return []models.Rating{}
+				}
+			},
+			expected: []models.Rating{},
+		},
+	}
 
-	defer func() {
-		if r := recover(); r != nil {
-			t.Logf("GetAllRatings panicked as expected with nil repo: %v", r)
-		} else {
-			t.Errorf("GetAllRatings did not panic with nil repo")
-		}
-	}()
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := &mocks.RatingRepositoryMock{}
+			tt.mockFn(mockRepo)
+			service := NewRatingService(mockRepo)
 
-	_ = service.GetAllRatings() // Expect panic
-	t.Log("TestRatingService_GetAllRatings executed (placeholder, expecting panic)")
+			got := service.GetAllRatings()
+			if len(got) != len(tt.expected) {
+				t.Errorf("GetAllRatings() got = %v ratings, want %v", len(got), len(tt.expected))
+			}
+		})
+	}
 }
 
 // TestRatingService_GetRatingByID tests GetRatingByID with a nil repository.
 func TestRatingService_GetRatingByID(t *testing.T) {
-	service := NewRatingService(nil)
-	id := 1
-
-	defer func() {
-		if r := recover(); r != nil {
-			t.Logf("GetRatingByID panicked as expected with nil repo: %v", r)
-		} else {
-			t.Errorf("GetRatingByID did not panic with nil repo")
-		}
-	}()
-
-	_, err := service.GetRatingByID(id) // Expect panic
-	if err == nil && recover() == nil {
-		t.Errorf("GetRatingByID: expected panic or error with nil repo, got nil error and no panic")
+	tests := []struct {
+		name    string
+		id      int
+		mockFn  func(mock *mocks.RatingRepositoryMock)
+		want    models.Rating
+		wantErr bool
+	}{
+		{
+			name: "success",
+			id:   1,
+			mockFn: func(mock *mocks.RatingRepositoryMock) {
+				mock.GetRatingByIDFunc = func(id int) (models.Rating, error) {
+					return models.Rating{MatchID: 1, PlayerID: 1}, nil
+				}
+			},
+			want:    models.Rating{MatchID: 1, PlayerID: 1},
+			wantErr: false,
+		},
+		{
+			name: "not found",
+			id:   999,
+			mockFn: func(mock *mocks.RatingRepositoryMock) {
+				mock.GetRatingByIDFunc = func(id int) (models.Rating, error) {
+					return models.Rating{}, errors.New("not found")
+				}
+			},
+			want:    models.Rating{},
+			wantErr: true,
+		},
 	}
-	t.Log("TestRatingService_GetRatingByID executed (placeholder, expecting panic)")
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := &mocks.RatingRepositoryMock{}
+			tt.mockFn(mockRepo)
+			service := NewRatingService(mockRepo)
+
+			got, err := service.GetRatingByID(tt.id)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetRatingByID() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !tt.wantErr && got.MatchID != tt.want.MatchID {
+				t.Errorf("GetRatingByID() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
 
 // TestRatingService_UpdateRating tests UpdateRating with a nil repository.
 func TestRatingService_UpdateRating(t *testing.T) {
-	service := NewRatingService(nil)
-	rating := models.Rating{ID: 1}
-
-	defer func() {
-		if r := recover(); r != nil {
-			t.Logf("UpdateRating panicked as expected with nil repo: %v", r)
-		} else {
-			t.Errorf("UpdateRating did not panic with nil repo")
-		}
-	}()
-
-	err := service.UpdateRating(rating) // Expect panic
-	if err == nil && recover() == nil {
-		t.Errorf("UpdateRating: expected panic or error with nil repo, got nil error and no panic")
+	tests := []struct {
+		name    string
+		rating  models.Rating
+		mockFn  func(mock *mocks.RatingRepositoryMock)
+		wantErr bool
+	}{
+		{
+			name: "success",
+			rating: models.Rating{
+				MatchID:       1,
+				PlayerID:      1,
+				RatedPlayerID: 2,
+				Finishing:     90,
+			},
+			mockFn: func(mock *mocks.RatingRepositoryMock) {
+				mock.UpdateRatingFunc = func(rating models.Rating) error {
+					return nil
+				}
+			},
+			wantErr: false,
+		},
+		{
+			name: "not found",
+			rating: models.Rating{
+				MatchID:       1,
+				PlayerID:      1,
+				RatedPlayerID: 2,
+				Finishing:     90,
+			},
+			mockFn: func(mock *mocks.RatingRepositoryMock) {
+				mock.UpdateRatingFunc = func(rating models.Rating) error {
+					return errors.New("not found")
+				}
+			},
+			wantErr: true,
+		},
 	}
-	t.Log("TestRatingService_UpdateRating executed (placeholder, expecting panic)")
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := &mocks.RatingRepositoryMock{}
+			tt.mockFn(mockRepo)
+			service := NewRatingService(mockRepo)
+
+			err := service.UpdateRating(tt.rating)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("UpdateRating() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
 }
 
 // TestRatingService_DeleteRating tests DeleteRating with a nil repository.
 func TestRatingService_DeleteRating(t *testing.T) {
-	service := NewRatingService(nil)
-	id := 1
-
-	defer func() {
-		if r := recover(); r != nil {
-			t.Logf("DeleteRating panicked as expected with nil repo: %v", r)
-		} else {
-			t.Errorf("DeleteRating did not panic with nil repo")
-		}
-	}()
-
-	err := service.DeleteRating(id) // Expect panic
-	if err == nil && recover() == nil {
-		t.Errorf("DeleteRating: expected panic or error with nil repo, got nil error and no panic")
+	tests := []struct {
+		name    string
+		id      int
+		mockFn  func(mock *mocks.RatingRepositoryMock)
+		wantErr bool
+	}{
+		{
+			name: "success",
+			id:   1,
+			mockFn: func(mock *mocks.RatingRepositoryMock) {
+				mock.DeleteRatingFunc = func(id int) error {
+					return nil
+				}
+			},
+			wantErr: false,
+		},
+		{
+			name: "not found",
+			id:   999,
+			mockFn: func(mock *mocks.RatingRepositoryMock) {
+				mock.DeleteRatingFunc = func(id int) error {
+					return errors.New("not found")
+				}
+			},
+			wantErr: true,
+		},
 	}
-	t.Log("TestRatingService_DeleteRating executed (placeholder, expecting panic)")
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := &mocks.RatingRepositoryMock{}
+			tt.mockFn(mockRepo)
+			service := NewRatingService(mockRepo)
+
+			err := service.DeleteRating(tt.id)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DeleteRating() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
 }

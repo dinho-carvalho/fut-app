@@ -1,111 +1,243 @@
 package services
 
 import (
+	"errors"
 	"testing"
+	"time"
 
 	"fut-app/internal/database/models"
+	"fut-app/internal/repositories/mocks"
 	// "fut-app/internal/repositories" // Not strictly needed for type compilation with nil repo
 )
 
 // TestMatchService_CreateMatch tests CreateMatch with a nil repository.
 func TestMatchService_CreateMatch(t *testing.T) {
-	service := NewMatchService(nil) // Initialize with nil repository
-	match := models.Match{}        // Zero-value model
-
-	defer func() {
-		if r := recover(); r != nil {
-			t.Logf("CreateMatch panicked as expected with nil repo: %v", r)
-		} else {
-			// This path should ideally not be hit if the method directly calls the repo.
-			// If an error is returned before panic, this indicates different behavior.
-			t.Errorf("CreateMatch did not panic with nil repo, check for preliminary error return or logic.")
-		}
-	}()
-
-	// Call the method, expecting a panic
-	err := service.CreateMatch(match)
-
-	// This part of the test might only be reached if the method returns an error *before*
-	// trying to use the nil repository, which is not the case for current service structure.
-	// If an error is returned (e.g. from validation) and no panic, the defer func won't log a panic.
-	if err == nil && recover() == nil { // Check if no error returned AND no panic occurred
-		t.Errorf("CreateMatch: expected panic or error with nil repo, got nil error and no panic")
+	tests := []struct {
+		name    string
+		match   models.Match
+		mockFn  func(mock *mocks.MatchRepositoryMock)
+		wantErr bool
+	}{
+		{
+			name: "success",
+			match: models.Match{
+				Date: time.Now(),
+			},
+			mockFn: func(mock *mocks.MatchRepositoryMock) {
+				mock.CreateMatchFunc = func(match models.Match) error {
+					return nil
+				}
+			},
+			wantErr: false,
+		},
+		{
+			name: "error",
+			match: models.Match{
+				Date: time.Now(),
+			},
+			mockFn: func(mock *mocks.MatchRepositoryMock) {
+				mock.CreateMatchFunc = func(match models.Match) error {
+					return errors.New("database error")
+				}
+			},
+			wantErr: true,
+		},
 	}
-	t.Log("TestMatchService_CreateMatch executed (placeholder, expecting panic)")
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := &mocks.MatchRepositoryMock{}
+			tt.mockFn(mockRepo)
+			service := NewMatchService(mockRepo)
+
+			err := service.CreateMatch(tt.match)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("CreateMatch() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
 }
 
 // TestMatchService_GetAllMatches tests GetAllMatches with a nil repository.
 func TestMatchService_GetAllMatches(t *testing.T) {
-	service := NewMatchService(nil)
+	tests := []struct {
+		name     string
+		mockFn   func(mock *mocks.MatchRepositoryMock)
+		expected []models.Match
+	}{
+		{
+			name: "success with matches",
+			mockFn: func(mock *mocks.MatchRepositoryMock) {
+				mock.GetMatchesFunc = func() []models.Match {
+					return []models.Match{{Date: time.Now()}}
+				}
+			},
+			expected: []models.Match{{Date: time.Now()}},
+		},
+		{
+			name: "success empty",
+			mockFn: func(mock *mocks.MatchRepositoryMock) {
+				mock.GetMatchesFunc = func() []models.Match {
+					return []models.Match{}
+				}
+			},
+			expected: []models.Match{},
+		},
+	}
 
-	defer func() {
-		if r := recover(); r != nil {
-			t.Logf("GetAllMatches panicked as expected with nil repo: %v", r)
-		} else {
-			t.Errorf("GetAllMatches did not panic with nil repo")
-		}
-	}()
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := &mocks.MatchRepositoryMock{}
+			tt.mockFn(mockRepo)
+			service := NewMatchService(mockRepo)
 
-	_ = service.GetAllMatches() // Expect panic
-	t.Log("TestMatchService_GetAllMatches executed (placeholder, expecting panic)")
+			got := service.GetAllMatches()
+			if len(got) != len(tt.expected) {
+				t.Errorf("GetAllMatches() got = %v, want %v", got, tt.expected)
+			}
+		})
+	}
 }
 
 // TestMatchService_GetMatchByID tests GetMatchByID with a nil repository.
 func TestMatchService_GetMatchByID(t *testing.T) {
-	service := NewMatchService(nil)
-	id := 1
-
-	defer func() {
-		if r := recover(); r != nil {
-			t.Logf("GetMatchByID panicked as expected with nil repo: %v", r)
-		} else {
-			t.Errorf("GetMatchByID did not panic with nil repo")
-		}
-	}()
-
-	_, err := service.GetMatchByID(id) // Expect panic
-	if err == nil && recover() == nil {
-		t.Errorf("GetMatchByID: expected panic or error with nil repo, got nil error and no panic")
+	tests := []struct {
+		name    string
+		id      int
+		mockFn  func(mock *mocks.MatchRepositoryMock)
+		want    models.Match
+		wantErr bool
+	}{
+		{
+			name: "success",
+			id:   1,
+			mockFn: func(mock *mocks.MatchRepositoryMock) {
+				mock.GetMatchByIDFunc = func(id int) (models.Match, error) {
+					return models.Match{Date: time.Now()}, nil
+				}
+			},
+			want:    models.Match{Date: time.Now()},
+			wantErr: false,
+		},
+		{
+			name: "not found",
+			id:   1,
+			mockFn: func(mock *mocks.MatchRepositoryMock) {
+				mock.GetMatchByIDFunc = func(id int) (models.Match, error) {
+					return models.Match{}, errors.New("not found")
+				}
+			},
+			want:    models.Match{},
+			wantErr: true,
+		},
 	}
-	t.Log("TestMatchService_GetMatchByID executed (placeholder, expecting panic)")
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := &mocks.MatchRepositoryMock{}
+			tt.mockFn(mockRepo)
+			service := NewMatchService(mockRepo)
+
+			got, err := service.GetMatchByID(tt.id)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetMatchByID() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !tt.wantErr && got.Date.IsZero() != tt.want.Date.IsZero() {
+				t.Errorf("GetMatchByID() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
 
 // TestMatchService_UpdateMatch tests UpdateMatch with a nil repository.
 func TestMatchService_UpdateMatch(t *testing.T) {
-	service := NewMatchService(nil)
-	match := models.Match{ID: 1}
-
-	defer func() {
-		if r := recover(); r != nil {
-			t.Logf("UpdateMatch panicked as expected with nil repo: %v", r)
-		} else {
-			t.Errorf("UpdateMatch did not panic with nil repo")
-		}
-	}()
-
-	err := service.UpdateMatch(match) // Expect panic
-	if err == nil && recover() == nil {
-		t.Errorf("UpdateMatch: expected panic or error with nil repo, got nil error and no panic")
+	tests := []struct {
+		name    string
+		match   models.Match
+		mockFn  func(mock *mocks.MatchRepositoryMock)
+		wantErr bool
+	}{
+		{
+			name: "success",
+			match: models.Match{
+				Date: time.Now(),
+			},
+			mockFn: func(mock *mocks.MatchRepositoryMock) {
+				mock.UpdateMatchFunc = func(match models.Match) error {
+					return nil
+				}
+			},
+			wantErr: false,
+		},
+		{
+			name: "error",
+			match: models.Match{
+				Date: time.Now(),
+			},
+			mockFn: func(mock *mocks.MatchRepositoryMock) {
+				mock.UpdateMatchFunc = func(match models.Match) error {
+					return errors.New("database error")
+				}
+			},
+			wantErr: true,
+		},
 	}
-	t.Log("TestMatchService_UpdateMatch executed (placeholder, expecting panic)")
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := &mocks.MatchRepositoryMock{}
+			tt.mockFn(mockRepo)
+			service := NewMatchService(mockRepo)
+
+			err := service.UpdateMatch(tt.match)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("UpdateMatch() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
 }
 
 // TestMatchService_DeleteMatch tests DeleteMatch with a nil repository.
 func TestMatchService_DeleteMatch(t *testing.T) {
-	service := NewMatchService(nil)
-	id := 1
-
-	defer func() {
-		if r := recover(); r != nil {
-			t.Logf("DeleteMatch panicked as expected with nil repo: %v", r)
-		} else {
-			t.Errorf("DeleteMatch did not panic with nil repo")
-		}
-	}()
-
-	err := service.DeleteMatch(id) // Expect panic
-	if err == nil && recover() == nil {
-		t.Errorf("DeleteMatch: expected panic or error with nil repo, got nil error and no panic")
+	tests := []struct {
+		name    string
+		id      int
+		mockFn  func(mock *mocks.MatchRepositoryMock)
+		wantErr bool
+	}{
+		{
+			name: "success",
+			id:   1,
+			mockFn: func(mock *mocks.MatchRepositoryMock) {
+				mock.DeleteMatchFunc = func(id int) error {
+					return nil
+				}
+			},
+			wantErr: false,
+		},
+		{
+			name: "error",
+			id:   1,
+			mockFn: func(mock *mocks.MatchRepositoryMock) {
+				mock.DeleteMatchFunc = func(id int) error {
+					return errors.New("database error")
+				}
+			},
+			wantErr: true,
+		},
 	}
-	t.Log("TestMatchService_DeleteMatch executed (placeholder, expecting panic)")
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := &mocks.MatchRepositoryMock{}
+			tt.mockFn(mockRepo)
+			service := NewMatchService(mockRepo)
+
+			err := service.DeleteMatch(tt.id)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DeleteMatch() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
 }

@@ -2,17 +2,7 @@ package database
 
 import (
 	"context"
-	"time"
-
-	"gorm.io/gorm"
 )
-
-type Model struct {
-	ID        uint `gorm:"primarykey"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index"`
-}
 
 type QueryOptions struct {
 	Page     int
@@ -29,13 +19,13 @@ type PaginatedResult struct {
 	TotalPages int
 }
 
-// Método auxiliar para paginação
+// Paginate é um método auxiliar para paginação
 func (db *Database) Paginate(ctx context.Context, model interface{}, opts QueryOptions) (*PaginatedResult, error) {
 	var total int64
 	query := db.WithContext(ctx).Model(model)
 
 	if opts.Search != "" {
-		// TODO implement pagination logic
+		// TODO implement search logic
 	}
 
 	if err := query.Count(&total).Error; err != nil {

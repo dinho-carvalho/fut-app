@@ -1,0 +1,17 @@
+# Arquivos de configuração
+cmd/main.go
+internal/database/config.go
+
+# Scripts e ferramentas
+scripts/
+tools/
+
+# Arquivos de migração
+*.sql
+
+# Arquivos de teste
+*_test.go
+
+# Arquivos de documentação
+*.md
+LICENSE 

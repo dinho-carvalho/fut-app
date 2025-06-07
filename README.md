@@ -1,112 +1,151 @@
-# 📌 Projeto Futebol Stats
+# Fut App - Estatísticas de Futebol Amador
 
-Este projeto tem como objetivo gerenciar estatísticas de jogadores de futebol amador, permitindo a avaliação de desempenho com notas de 45 a 99.
+## 📝 Sobre o Projeto
 
----
+O Fut App é uma aplicação para gerenciar estatísticas de jogadores de futebol amador. Com ele, você pode:
 
-## 🚀 Como Rodar o Projeto do Zero
+- Registrar jogadores
+- Registrar partidas
+- Registrar resultados
+- Acompanhar estatísticas de jogadores
+- Avaliar desempenho dos jogadores
 
-### **1️⃣ Pré-requisitos**
-Antes de começar, você precisará ter instalado:
-- **Golang** (versão 1.20+)
-- **Docker** e **Docker Compose**
-- **PostgreSQL** (caso prefira rodar localmente sem Docker)
-- **Make** (opcional, para rodar comandos mais facilmente)
-- **gofumpt** (para manter o padrão de formatação do código)
+## 🚀 Tecnologias
 
-### **2️⃣ Configurar Projeto**
-Se estiver utilizando Docker, basta rodar:
-```sh
-make up
+- Go 1.21+
+- PostgreSQL
+- Docker
+- Docker Compose
+- GORM (ORM)
+- Gorilla Mux (Router)
+
+## 📋 Pré-requisitos
+
+- Go 1.21 ou superior
+- Docker e Docker Compose (opcional)
+- PostgreSQL (se não usar Docker)
+- Make (para comandos de conveniência)
+
+## 🔧 Configuração Local
+
+### Com Docker
+
+1. Clone o repositório:
+```bash
+git clone https://github.com/seu-usuario/fut-app.git
+cd fut-app
 ```
-Ou, manualmente:
-```sh
+
+2. Inicie os containers:
+```bash
 docker-compose up -d
 ```
-Se preferir rodar o PostgreSQL localmente:
-```sh
-docker run --name futebol-db -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=admin -e POSTGRES_DB=futebol_stats -p 5432:5432 -d postgres
-```
 
-E configure a conexão no `.env`.
-
-### **3️⃣ Configurar Variáveis de Ambiente**
-Crie um arquivo **`.env`** na raiz do projeto e adicione:
-```env
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=yourpassword
-DB_NAME=futebol_stats
-```
-
-### **4️⃣ Instalar Dependências**
-```sh
-go mod tidy
-```
-
-### **6️⃣ Rodar a Aplicação**
-```sh
-go ./cmd/run main.go
-```
-Ou, com Makefile:
-```sh
+3. Execute a aplicação:
+```bash
 make run
 ```
 
-### **7️⃣ Testar API**
-Acesse `http://localhost:8080` para verificar se a API está rodando.
+### Sem Docker (PostgreSQL Local)
 
----
-
-## 📌 Comandos Úteis
-
-### **🚀 Subir o app com docker**
-```sh
-make up
-```
-### **🛑 Para instância do docker**
-```sh
-make down
-```
-### **🧹 Limpar Dependências e Cache**
-```sh
-make clean
-```
-### **🔄 Rodar Tests**
-```sh
-make test
-```
-### **📝 Formatar Código com gofumpt**
-```sh
-gofumpt -w .
+1. Clone o repositório:
+```bash
+git clone https://github.com/seu-usuario/fut-app.git
+cd fut-app
 ```
 
----
+2. Configure o PostgreSQL local:
+```bash
+createdb futebol_stats
+```
 
----
+3. Configure as variáveis de ambiente:
+```bash
+export DB_HOST=localhost
+export DB_USER=seu_usuario
+export DB_PASSWORD=sua_senha
+export DB_NAME=futebol_stats
+export DB_PORT=5432
+```
 
-## Local Development
+4. Execute a aplicação:
+```bash
+make run
+```
 
-### Generating Test Coverage Report
+## 🛠️ Comandos Úteis
 
-To generate an HTML report of your unit test coverage locally, run the following Make command:
+- `make run`: Executa a aplicação
+- `make test`: Executa os testes
+- `make test-coverage`: Executa os testes com cobertura
+- `make lint`: Executa o linter
+- `make build`: Compila o projeto
+- `make docker-build`: Constrói a imagem Docker
+- `make docker-run`: Executa o container Docker
+
+## 📊 Cobertura de Testes
+
+O projeto tem como meta manter uma cobertura de testes de 98%. Para verificar a cobertura:
 
 ```bash
-make coverage-html
+make test-coverage
 ```
 
-This will execute the tests, calculate coverage, and create a `coverage.html` file in the project root. You can open this file in your web browser to view the detailed coverage report.
+### Arquivos Ignorados na Cobertura
 
-## CI/CD Pipeline
+Alguns arquivos são ignorados na cobertura de testes por serem arquivos de configuração ou não necessitarem de testes:
 
-This project uses GitHub Actions for its CI/CD pipeline. The workflow is defined in `.github/workflows/go.yml` and includes the following stages:
+- `cmd/main.go`
+- `internal/database/config.go`
+- Arquivos de migração
 
-1.  **Setup Go**: Initializes the Go environment.
-2.  **Checkout Code**: Checks out the repository's code.
-3.  **Download Dependencies**: Fetches the necessary Go modules.
-4.  **Linting**: A dedicated GitHub Actions workflow (`.github/workflows/golangci-lint.yml`) employs `golangci-lint` with the configurations defined in `.golangci.yml` to perform static analysis and identify potential issues.
-5.  **Unit Testing & Coverage**: Runs all unit tests using `go test`. It also calculates code coverage and **enforces a 98% minimum threshold**. The pipeline will fail if coverage is below this target.
-6.  **Build**: Compiles the application using `go build`.
+## 🌳 Estrutura do Projeto
 
-This pipeline helps maintain code quality and ensures that the application builds correctly with every push and pull request to the `main` branch.
+```
+.
+├── cmd/
+│   └── main.go
+├── internal/
+│   ├── database/
+│   │   ├── config.go
+│   │   ├── connection.go
+│   │   └── models/
+│   ├── handlers/
+│   ├── repositories/
+│   ├── routes/
+│   └── services/
+├── scripts/
+├── .gitignore
+├── .golangci.yml
+├── docker-compose.yml
+├── Dockerfile
+├── go.mod
+├── go.sum
+├── Makefile
+└── README.md
+```
+
+## 📝 Convenções de Código
+
+- Utilizamos o `golangci-lint` para garantir a qualidade do código
+- Seguimos as convenções do Go para nomes de pacotes e funções
+- Documentamos todas as funções públicas
+- Mantemos os testes atualizados com as mudanças no código
+
+## 🤝 Contribuindo
+
+1. Faça o fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## 📞 Contato
+
+Seu Nome - [@seu_twitter](https://twitter.com/seu_twitter) - seu_email@email.com
+
+Link do Projeto: [https://github.com/seu-usuario/fut-app](https://github.com/seu-usuario/fut-app)

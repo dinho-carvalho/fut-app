@@ -57,7 +57,7 @@ func (h *PlayerHandler) GetPlayerByID(w http.ResponseWriter, r *http.Request) {
 
 func (h *PlayerHandler) UpdatePlayer(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
+	_, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		http.Error(w, "Invalid ID", http.StatusBadRequest)
 		return
@@ -68,7 +68,7 @@ func (h *PlayerHandler) UpdatePlayer(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
-	if err = h.Service.UpdatePlayer(player, id); err != nil {
+	if err = h.Service.UpdatePlayer(player); err != nil {
 		http.Error(w, "Failed to update player", http.StatusInternalServerError)
 		return
 	}
