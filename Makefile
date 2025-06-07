@@ -27,7 +27,7 @@ test:
 # Generates an HTML coverage report
 coverage-html:
 	@echo "Generating HTML coverage report..."
-	@go test -coverprofile=coverage.out -covermode=atomic ./...
+	@go test -coverprofile=coverage.out -covermode=atomic ./internal/handlers/... ./internal/repositories/... ./internal/services/...
 	@go tool cover -html=coverage.out -o coverage.html
 	@echo "HTML coverage report generated: coverage.html"
 
