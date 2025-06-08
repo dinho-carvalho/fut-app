@@ -206,10 +206,11 @@ func TestPlayerService_UpdatePlayer(t *testing.T) {
 // TestPlayerService_DeletePlayer tests DeletePlayer with a nil repository.
 func TestPlayerService_DeletePlayer(t *testing.T) {
 	tests := []struct {
-		name    string
-		id      int
-		mockFn  func(mock *mocks.PlayerRepositoryMock)
-		wantErr bool
+		name       string
+		id         int
+		mockFn     func(mock *mocks.PlayerRepositoryMock)
+		wantErr    bool
+		wantErrMsg string
 	}{
 		{
 			name: "success",
@@ -229,7 +230,8 @@ func TestPlayerService_DeletePlayer(t *testing.T) {
 					return errors.New("database error")
 				}
 			},
-			wantErr: true,
+			wantErr:    true,
+			wantErrMsg: "database error",
 		},
 	}
 
@@ -240,8 +242,16 @@ func TestPlayerService_DeletePlayer(t *testing.T) {
 			service := NewPlayerService(mockRepo)
 
 			err := service.DeletePlayer(tt.id)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("DeletePlayer() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.wantErr {
+				if err == nil {
+					t.Errorf("DeletePlayer() expected error, got nil")
+				} else if tt.wantErrMsg != "" && err.Error() != tt.wantErrMsg {
+					t.Errorf("DeletePlayer() error = %v, wantErrMsg %v", err, tt.wantErrMsg)
+				}
+			} else {
+				if err != nil {
+					t.Errorf("DeletePlayer() unexpected error: %v", err)
+				}
 			}
 		})
 	}

@@ -7,19 +7,11 @@ import (
 	"fut-app/internal/repositories"
 )
 
-type IPlayerService interface {
-	CreatePlayer(models.Player) error
-	GetAllPlayers() []models.Player
-	GetPlayerByID(int) (models.Player, error)
-	UpdatePlayer(models.Player) error
-	DeletePlayer(int) error
-}
-
 type PlayerService struct {
 	repo repositories.PlayerRepository
 }
 
-func NewPlayerService(repo repositories.PlayerRepository) IPlayerService {
+func NewPlayerService(repo repositories.PlayerRepository) *PlayerService {
 	return &PlayerService{repo: repo}
 }
 
