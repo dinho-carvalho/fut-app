@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"fut-app/internal/database/models"
+
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 )
@@ -149,4 +150,76 @@ func TestPlayerHandler_DeletePlayer(t *testing.T) {
 	handler.DeletePlayer(w, req)
 	assert.Equal(t, http.StatusBadRequest, w.Result().StatusCode)
 	assert.Contains(t, w.Body.String(), "Invalid ID")
+}
+
+func TestPlayerHandler_CreatePlayer(t *testing.T) {
+	mockSvc := &mockPlayerService{}
+	handler := &PlayerHandler{Service: mockSvc}
+
+	// Sucesso
+	player := models.Player{Name: "Tostão"}
+	mockSvc.On("CreatePlayer", player).Return(nil)
+	b, _ := json.Marshal(player)
+	req := httptest.NewRequest("POST", "/players", bytes.NewBuffer(b))
+	w := httptest.NewRecorder()
+	handler.CreatePlayer(w, req)
+	assert.Equal(t, http.StatusCreated, w.Result().StatusCode)
+	assert.Contains(t, w.Body.String(), "Tostão")
+
+	// JSON inválido
+	req = httptest.NewRequest("POST", "/players", bytes.NewBuffer([]byte("{invalid")))
+	w = httptest.NewRecorder()
+	handler.CreatePlayer(w, req)
+	assert.Equal(t, http.StatusBadRequest, w.Result().StatusCode)
+	assert.Contains(t, w.Body.String(), "Invalid JSON")
+
+	// Erro do service
+	player2 := models.Player{Name: "Ronaldo"}
+	mockSvc.On("CreatePlayer", player2).Return(assert.AnError)
+	b, _ = json.Marshal(player2)
+	req = httptest.NewRequest("POST", "/players", bytes.NewBuffer(b))
+	w = httptest.NewRecorder()
+	handler.CreatePlayer(w, req)
+	assert.Equal(t, http.StatusInternalServerError, w.Result().StatusCode)
+	assert.Contains(t, w.Body.String(), "Failed to create player")
+}
+
+func TestPlayerHandler_GetPlayerByID_NotFound(t *testing.T) {
+	mockSvc := &mockPlayerService{}
+	handler := &PlayerHandler{Service: mockSvc}
+	mockSvc.On("GetPlayerByID", uint(2)).Return(nil, assert.AnError)
+
+	req := httptest.NewRequest("GET", "/players/2", nil)
+	req = mux.SetURLVars(req, map[string]string{"id": "2"})
+	w := httptest.NewRecorder()
+	handler.GetPlayerByID(w, req)
+	assert.Equal(t, http.StatusNotFound, w.Result().StatusCode)
+	assert.Contains(t, w.Body.String(), "Player not found")
+}
+
+func TestPlayerHandler_UpdatePlayer_ErrorService(t *testing.T) {
+	mockSvc := &mockPlayerService{}
+	handler := &PlayerHandler{Service: mockSvc}
+	player := models.Player{Name: "Zagallo"}
+	mockSvc.On("UpdatePlayer", player, uint(3)).Return(assert.AnError)
+	b, _ := json.Marshal(player)
+	req := httptest.NewRequest("PUT", "/players/3", bytes.NewBuffer(b))
+	req = mux.SetURLVars(req, map[string]string{"id": "3"})
+	w := httptest.NewRecorder()
+	handler.UpdatePlayer(w, req)
+	assert.Equal(t, http.StatusInternalServerError, w.Result().StatusCode)
+	assert.Contains(t, w.Body.String(), "Failed to update player")
+}
+
+func TestPlayerHandler_DeletePlayer_ErrorService(t *testing.T) {
+	mockSvc := &mockPlayerService{}
+	handler := &PlayerHandler{Service: mockSvc}
+	mockSvc.On("DeletePlayer", uint(4)).Return(assert.AnError)
+
+	req := httptest.NewRequest("DELETE", "/players/4", nil)
+	req = mux.SetURLVars(req, map[string]string{"id": "4"})
+	w := httptest.NewRecorder()
+	handler.DeletePlayer(w, req)
+	assert.Equal(t, http.StatusInternalServerError, w.Result().StatusCode)
+	assert.Contains(t, w.Body.String(), "Failed to delete player")
 }

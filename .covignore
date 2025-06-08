@@ -1,0 +1,5 @@
+/internal/routes
+/internal/database
+/cmd
+
+gocov.html
