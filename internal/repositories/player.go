@@ -12,9 +12,9 @@ type (
 	PlayerRepository interface {
 		CreatePlayer(models.Player) error
 		GetPlayers() []models.Player
-		GetPlayerByID(int) (*models.Player, error)
+		GetPlayerByID(uint) (*models.Player, error)
 		UpdatePlayer(models.Player) error
-		DeletePlayer(int) error
+		DeletePlayer(uint) error
 	}
 )
 
@@ -35,7 +35,7 @@ func (p *playerRepository) GetPlayers() []models.Player {
 	return players
 }
 
-func (p *playerRepository) GetPlayerByID(id int) (*models.Player, error) {
+func (p *playerRepository) GetPlayerByID(id uint) (*models.Player, error) {
 	var player models.Player
 	err := p.db.First(&player, id).Error
 
@@ -46,6 +46,6 @@ func (p *playerRepository) UpdatePlayer(player models.Player) error {
 	return p.db.Save(&player).Error
 }
 
-func (p *playerRepository) DeletePlayer(id int) error {
+func (p *playerRepository) DeletePlayer(id uint) error {
 	return p.db.Delete(&models.Player{}, id).Error
 }

@@ -22,7 +22,7 @@ func players(r *mux.Router, db *database.Database) {
 	repo := repositories.NewPlayer(db.DB)
 	service := services.NewPlayerService(repo)
 	playerHandler := handlers.PlayerHandler{
-		Service: *service,
+		Service: service,
 	}
 	r.HandleFunc("/players", playerHandler.CreatePlayer).Methods("POST")
 	r.HandleFunc("/players", playerHandler.GetPlayers).Methods("GET")
