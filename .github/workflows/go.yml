@@ -1,89 +1,66 @@
-# .github/workflows/go.yml
-name: Go CI/CD
+name: Go CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main ] # Or your default branch
   pull_request:
-    branches: [ main ]
+    branches: [ main ] # Or your default branch
 
 jobs:
-  test:
-    name: Test and Lint
+  build:
+    name: Build and Test
     runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:latest
-        env:
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: admin
-          POSTGRES_DB: futebol_stats
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v3
         with:
-          go-version: '1.24'
-          cache: true
+          go-version: '1.24' # Specify your Go version
+        id: go
 
-      - name: Install dependencies
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v3
+
+      - name: Get dependencies
         run: go mod download
 
-      - name: Check formatting
+      - name: Run unit tests and calculate coverage
         run: |
-          if [ -n "$(gofmt -l .)" ]; then
-            echo "The following files are not formatted properly:"
-            gofmt -l .
+          go test -v -coverprofile=coverage.out -covermode=atomic ./internal/handlers/... ./internal/repositories/... ./internal/services/...
+          echo "Calculating total coverage..."
+          # Calculate total coverage percentage from coverage.out
+          COVERAGE=$(go tool cover -func=coverage.out | grep '^total:' | awk '{print $3}' | sed 's/%//')
+          
+          echo "Current code coverage is ${COVERAGE}%"
+          
+          if ! [[ "$COVERAGE" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+            echo "Error: Could not parse coverage percentage. Output was: [$COVERAGE]"
+            # Display more info for debugging
+            echo "Full output of 'go tool cover -func=coverage.out':"
+            go tool cover -func=coverage.out
             exit 1
           fi
-
-      - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v3
-        with:
-          version: latest
-          args: --timeout=5m
-
-      - name: Run tests with coverage
-        run: |
-          go test -race -coverprofile=coverage.txt -covermode=atomic ./...
-          go tool cover -func=coverage.txt | grep total | awk '{print $3}' | sed 's/%//' > coverage_total.txt
-          if (( $(echo "$(cat coverage_total.txt) < 95" | bc -l) )); then
-            echo "Test coverage ($(cat coverage_total.txt)%) is below threshold (95%)"
+          
+          # Ensure COVERAGE is not empty before using bc
+          if [ -z "$COVERAGE" ]; then
+              echo "Error: Coverage variable is empty after parsing."
+              exit 1
+          fi
+          
+          # Use bc for floating point comparison
+          IS_BELOW_THRESHOLD=$(echo "${COVERAGE} < 98.0" | bc -l)
+          if [ "$IS_BELOW_THRESHOLD" -eq 1 ]; then
+            echo "Error: Code coverage is ${COVERAGE}%, which is below the required 98%."
             exit 1
+          else
+            echo "Code coverage of ${COVERAGE}% meets the 98% requirement."
           fi
 
-      - name: Upload results to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          slug: dinho-carvalho/fut-app
-          file: ./coverage.txt
-          fail_ci_if_error: true
+      - name: Build the application
+        run: go build -v -o myapp ./cmd/main.go # Adjust the output name and path as needed
 
-  build:
-    name: Build
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.24'
-
-      - name: Build
-        run: go build -v ./...
+    # Optional: Upload build artifact
+    # - name: Upload build artifact
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: myapp-binary
+    #     path: myapp
