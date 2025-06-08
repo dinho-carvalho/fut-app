@@ -55,8 +55,8 @@ func (h *PlayerHandler) GetPlayerByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	player, err := h.Service.GetPlayerByID(uint(id))
-	if err != nil {
+	player, errPlayer := h.Service.GetPlayerByID(uint(id))
+	if errPlayer != nil {
 		http.Error(w, "Player not found", http.StatusNotFound)
 		return
 	}
