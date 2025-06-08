@@ -36,11 +36,6 @@ func (h *PlayerHandler) CreatePlayer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	err = json.NewEncoder(w).Encode(player)
-	if err != nil {
-		http.Error(w, "Failed to encode player", http.StatusInternalServerError)
-		return
-	}
 }
 
 func (h *PlayerHandler) GetPlayers(w http.ResponseWriter, r *http.Request) {
@@ -66,7 +61,11 @@ func (h *PlayerHandler) GetPlayerByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = json.NewEncoder(w).Encode(player)
+	errEncode := json.NewEncoder(w).Encode(player)
+	if errEncode != nil {
+		http.Error(w, "Failed to encode player", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *PlayerHandler) UpdatePlayer(w http.ResponseWriter, r *http.Request) {
@@ -86,8 +85,8 @@ func (h *PlayerHandler) UpdatePlayer(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to update player", http.StatusInternalServerError)
 		return
 	}
-	err = json.NewEncoder(w).Encode(player)
-	if err != nil {
+	errEncode := json.NewEncoder(w).Encode(player)
+	if errEncode != nil {
 		http.Error(w, "Failed to encode player", http.StatusInternalServerError)
 		return
 	}
