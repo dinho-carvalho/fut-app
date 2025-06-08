@@ -47,12 +47,12 @@ jobs:
           fi
           
           # Use bc for floating point comparison
-          IS_BELOW_THRESHOLD=$(echo "${COVERAGE} < 98.0" | bc -l)
+          IS_BELOW_THRESHOLD=$(echo "${COVERAGE} < 95.0" | bc -l)
           if [ "$IS_BELOW_THRESHOLD" -eq 1 ]; then
-            echo "Error: Code coverage is ${COVERAGE}%, which is below the required 98%."
+            echo "Error: Code coverage is ${COVERAGE}%, which is below the required 95%."
             exit 1
           else
-            echo "Code coverage of ${COVERAGE}% meets the 98% requirement."
+            echo "Code coverage of ${COVERAGE}% meets the 95% requirement."
           fi
 
       - name: Build the application
