@@ -7,27 +7,36 @@ import (
 	"fut-app/internal/repositories"
 )
 
-type PlayerService struct {
-	repo repositories.PlayerRepository
+type (
+	PlayerService interface {
+		CreatePlayer(models.Player) error
+		GetAllPlayers() []models.Player
+		GetPlayerByID(uint) (*models.Player, error)
+		UpdatePlayer(models.Player, uint) error
+		DeletePlayer(uint) error
+	}
+	playerimpl struct {
+		repo repositories.PlayerRepository
+	}
+)
+
+func NewPlayerService(repo repositories.PlayerRepository) PlayerService {
+	return &playerimpl{repo: repo}
 }
 
-func NewPlayerService(repo repositories.PlayerRepository) *PlayerService {
-	return &PlayerService{repo: repo}
-}
-
-func (s *PlayerService) CreatePlayer(player models.Player) error {
+func (s *playerimpl) CreatePlayer(player models.Player) error {
 	return s.repo.CreatePlayer(player)
 }
 
-func (s *PlayerService) GetAllPlayers() []models.Player {
+func (s *playerimpl) GetAllPlayers() []models.Player {
 	return s.repo.GetPlayers()
 }
 
-func (s *PlayerService) GetPlayerByID(id int) (*models.Player, error) {
+func (s *playerimpl) GetPlayerByID(id uint) (*models.Player, error) {
 	return s.repo.GetPlayerByID(id)
 }
 
-func (s *PlayerService) UpdatePlayer(player models.Player, id int) error {
+func (s *playerimpl) UpdatePlayer(player models.Player, id uint) error {
 	p, err := s.repo.GetPlayerByID(id)
 	if err != nil {
 		return errors.New("error") // TODO refatorar
@@ -38,6 +47,6 @@ func (s *PlayerService) UpdatePlayer(player models.Player, id int) error {
 	return s.repo.UpdatePlayer(player)
 }
 
-func (s *PlayerService) DeletePlayer(id int) error {
+func (s *playerimpl) DeletePlayer(id uint) error {
 	return s.repo.DeletePlayer(id)
 }
