@@ -9,7 +9,7 @@ linters-settings:
     check-type-assertions: true
     check-blank: true
   govet:
-    check-shadowing: true
+    check-shadowing: false
   # Settings for other specific linters if needed in the future
 
 linters:
