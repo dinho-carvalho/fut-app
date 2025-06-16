@@ -27,3 +27,4 @@ go.work.sum
 gocov.html
 gocov.json
 coverage.html
+.idea

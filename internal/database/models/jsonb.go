@@ -6,9 +6,9 @@ import (
 	"fmt"
 )
 
-type JSONB map[string]int
+type JSONB map[string]any // change to interface for tests.
 
-func (j JSONB) Value() (driver.Value, error) {
+func (j *JSONB) Value() (driver.Value, error) {
 	return json.Marshal(j)
 }
 
