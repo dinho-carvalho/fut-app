@@ -3,13 +3,15 @@ package services
 import (
 	"errors"
 
+	"fut-app/internal/domain"
+
 	"fut-app/internal/database/models"
 	"fut-app/internal/repositories"
 )
 
 type (
 	PlayerService interface {
-		CreatePlayer(models.Player) error
+		CreatePlayer(domain.Player) error
 		GetAllPlayers() []models.Player
 		GetPlayerByID(uint) (*models.Player, error)
 		UpdatePlayer(models.Player, uint) error
@@ -24,7 +26,7 @@ func NewPlayerService(repo repositories.PlayerRepository) PlayerService {
 	return &playerimpl{repo: repo}
 }
 
-func (s *playerimpl) CreatePlayer(player models.Player) error {
+func (s *playerimpl) CreatePlayer(player domain.Player) error {
 	return s.repo.CreatePlayer(player)
 }
 

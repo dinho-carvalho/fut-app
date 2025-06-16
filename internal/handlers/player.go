@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"fut-app/internal/services"
-
 	"fut-app/internal/database/models"
+	"fut-app/internal/handlers/dto"
+	"fut-app/internal/services"
 
 	"github.com/gorilla/mux"
 )
@@ -23,13 +23,8 @@ func NewPlayerHandler(service services.PlayerService) *PlayerHandler {
 	}
 }
 
-func (h *PlayerHandler) CreatePlayer(w http.ResponseWriter, r *http.Request) {
-	var player models.Player
-	if err := json.NewDecoder(r.Body).Decode(&player); err != nil {
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
-		return
-	}
-	err := h.Service.CreatePlayer(player)
+func (h *PlayerHandler) CreatePlayer(w http.ResponseWriter, r *http.Request, p dto.PlayerDTO) {
+	err := h.Service.CreatePlayer(p.ToDomain())
 	if err != nil {
 		http.Error(w, "Failed to create player", http.StatusInternalServerError)
 		return

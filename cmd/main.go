@@ -1,37 +1,52 @@
 package main
 
 import (
-	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
+
+	"fut-app/pkg/logger"
+
+	"fut-app/internal/handlers/routes"
 
 	"github.com/gorilla/mux"
-
-	"fut-app/internal/routes"
 
 	"fut-app/internal/database"
 	"fut-app/internal/database/models"
 )
 
 func main() {
+	logger := logger.NewLogger(logger.Config{
+		AppName: "fut-app",
+	})
+	slog.SetDefault(logger)
+	db := createDatabase()
+
+	r := mux.NewRouter()
+	routes.CreateRoutes(r, db, logger)
+
+	slog.Info("🚀 Server is running on port 8080")
+	slog.Info("It's time ⚽ ⚽ ⚽ ⚽ ⚽ ⚽")
+	if err := http.ListenAndServe(":8080", r); err != nil {
+		slog.Error("Error starting server", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
+}
+
+func createDatabase() *database.Database {
 	config := database.NewConfig()
 	db, err := database.NewDatabase(config)
 	if err != nil {
-		log.Fatal("❌ Failed to connect to the database")
+		slog.Error("❌ Failed to connect to the database", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
 
-	fmt.Println("✅ Successfully connected to the database!")
+	slog.Info("✅ Successfully connected to the database!")
 
-	err = db.AutoMigrate(&models.Player{}, &models.Match{}, &models.Rating{})
+	err = db.AutoMigrate(&models.Player{}, &models.Position{}, &models.Match{}, &models.Rating{})
 	if err != nil {
-		panic(err)
+		slog.Error("❌ Error in auto migrate", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
-
-	r := mux.NewRouter()
-	routes.CreateRoutes(r, db)
-
-	fmt.Println("🚀 Server is running on port 8080")
-	log.Fatal(http.ListenAndServe(":8080", r))
-
-	fmt.Println("It's time ⚽ ⚽ ⚽ ⚽ ⚽ ⚽ ")
+	return db
 }
