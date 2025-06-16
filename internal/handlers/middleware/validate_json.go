@@ -1,6 +1,4 @@
 package middleware
-<<<<<<< HEAD
-=======
 
 import (
 	"encoding/json"
@@ -92,4 +90,3 @@ func validationMessage(e validator.FieldError) string {
 		return "Invalid value"
 	}
 }
->>>>>>> 0f4fc5e (feat: create player)

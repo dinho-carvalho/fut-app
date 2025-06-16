@@ -27,11 +27,7 @@ func players(r *mux.Router, db *database.Database, logger *slog.Logger) {
 	repo := repositories.NewPlayer(db.DB, logger)
 	service := services.NewPlayerService(repo)
 	playerHandler := handlers.NewPlayerHandler(service)
-<<<<<<< HEAD
-	r.HandleFunc("/players", playerHandler.CreatePlayer).Methods("POST")
-=======
 	r.HandleFunc("/players", middleware.ValidateJSON[dto.PlayerDTO](playerHandler.CreatePlayer)).Methods("POST")
->>>>>>> 0f4fc5e (feat: create player)
 	r.HandleFunc("/players", playerHandler.GetPlayers).Methods("GET")
 	r.HandleFunc("/players/{id:[0-9]+}", playerHandler.GetPlayerByID).Methods("GET")
 	r.HandleFunc("/players/{id:[0-9]+}", playerHandler.UpdatePlayer).Methods("PUT")

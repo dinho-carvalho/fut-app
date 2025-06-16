@@ -2,8 +2,6 @@ package middleware
 
 import "github.com/go-playground/validator/v10"
 
-var validate = validator.New()
-
 func statsLength(fl validator.FieldLevel) bool {
 	stats, ok := fl.Field().Interface().(map[string]interface{})
 	if !ok {
