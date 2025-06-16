@@ -21,9 +21,7 @@ func CreateRoutes(r *mux.Router, db *database.Database) {
 func players(r *mux.Router, db *database.Database) {
 	repo := repositories.NewPlayer(db.DB)
 	service := services.NewPlayerService(repo)
-	playerHandler := handlers.PlayerHandler{
-		Service: service,
-	}
+	playerHandler := handlers.NewPlayerHandler(service)
 	r.HandleFunc("/players", playerHandler.CreatePlayer).Methods("POST")
 	r.HandleFunc("/players", playerHandler.GetPlayers).Methods("GET")
 	r.HandleFunc("/players/{id:[0-9]+}", playerHandler.GetPlayerByID).Methods("GET")
