@@ -12,7 +12,7 @@ type (
 	}
 
 	PositionDTO struct {
-		Name string `json:"name" required:"true"`
+		Name string `json:"name" validate:"required"`
 	}
 )
 

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"fut-app/internal/database"
 	"fut-app/internal/database/models"
 	"fut-app/internal/domain"
 
@@ -16,40 +17,59 @@ type (
 		db     *gorm.DB
 		logger *slog.Logger
 	}
-	PlayerRepository interface {
-		CreatePlayer(domain.Player) error
+	Player interface {
+		CreatePlayer(domain.Player) (*domain.Player, error)
 		GetPlayers() []models.Player
 		GetPlayerByID(uint) (*models.Player, error)
-		UpdatePlayer(models.Player) error
+		UpdatePlayer(domain.Player) error
 		DeletePlayer(uint) error
 	}
 )
 
-func NewPlayer(DB *gorm.DB, l *slog.Logger) PlayerRepository {
+func NewPlayer(DB *gorm.DB, l *slog.Logger) Player {
 	return &playerRepository{
 		db:     DB,
 		logger: l,
 	}
 }
 
-func (p *playerRepository) CreatePlayer(player domain.Player) error {
+func (p *playerRepository) CreatePlayer(player domain.Player) (*domain.Player, error) {
 	positions, err := p.getPositions(player)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	modelPlayer := models.Player{
 		Name:     player.Name,
-		Stats:    player.Stats,
+		Stats:    models.JSONB(player.Stats),
 		Position: positions,
 	}
 	err = p.db.Create(&modelPlayer).Error
 	if err != nil {
-		p.logger.Error("erro ao criar jogador",
+		p.logger.Error("error when trying to create player",
 			slog.String("name", player.Name),
 			slog.String("error", err.Error()),
 		)
+		return nil, err
 	}
-	return err
+
+	if err := p.db.Preload("Position").First(&modelPlayer, modelPlayer.ID).Error; err != nil {
+		return nil, err
+	}
+
+	return &domain.Player{
+		ID:       modelPlayer.ID,
+		Name:     modelPlayer.Name,
+		Stats:    modelPlayer.Stats,
+		Position: extractPositionNames(modelPlayer.Position),
+	}, nil
+}
+
+func extractPositionNames(positions []models.Position) []string {
+	names := make([]string, len(positions))
+	for i, pos := range positions {
+		names[i] = pos.Name
+	}
+	return names
 }
 
 func (p *playerRepository) GetPlayers() []models.Player {
@@ -66,8 +86,22 @@ func (p *playerRepository) GetPlayerByID(id uint) (*models.Player, error) {
 	return &player, err
 }
 
-func (p *playerRepository) UpdatePlayer(player models.Player) error {
-	return p.db.Save(&player).Error
+func (p *playerRepository) UpdatePlayer(player domain.Player) error {
+	// Convert domain.Player to models.Player for database update
+	modelPlayer := models.Player{
+		Model: database.Model{ID: player.ID},
+		Name:  player.Name,
+		Stats: models.JSONB(player.Stats),
+	}
+
+	// Get positions for the player
+	positions, err := p.getPositions(player)
+	if err != nil {
+		return err
+	}
+	modelPlayer.Position = positions
+
+	return p.db.Save(&modelPlayer).Error
 }
 
 func (p *playerRepository) DeletePlayer(id uint) error {

@@ -1,105 +1,76 @@
 package handlers
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
-	"strconv"
 
-	"fut-app/internal/database/models"
+	"fut-app/internal/usecase"
+
+	"fut-app/internal/handlers/httprespond"
+
 	"fut-app/internal/handlers/dto"
-	"fut-app/internal/services"
-
-	"github.com/gorilla/mux"
 )
 
 type PlayerHandler struct {
-	Service services.PlayerService
+	usecase.RegisterPlayerUseCase
 }
 
-func NewPlayerHandler(service services.PlayerService) *PlayerHandler {
+func NewPlayerHandler(p usecase.RegisterPlayerUseCase) *PlayerHandler {
 	return &PlayerHandler{
-		Service: service,
+		RegisterPlayerUseCase: p,
 	}
 }
 
-func (h *PlayerHandler) CreatePlayer(w http.ResponseWriter, r *http.Request, p dto.PlayerDTO) {
-	err := h.Service.CreatePlayer(p.ToDomain())
+func (h *PlayerHandler) CreatePlayer(w http.ResponseWriter, r *http.Request, p dto.PlayerDTO) error {
+	newPlayer, err := h.RegisterPlayerUseCase.Execute(p.ToDomain())
 	if err != nil {
-		http.Error(w, "Failed to create player", http.StatusInternalServerError)
-		return
+		return err
 	}
-
-	w.WriteHeader(http.StatusCreated)
+	return httprespond.JSON(w, http.StatusCreated, newPlayer)
 }
 
-func (h *PlayerHandler) GetPlayers(w http.ResponseWriter, r *http.Request) {
-	players := h.Service.GetAllPlayers()
-	err := json.NewEncoder(w).Encode(players)
-	if err != nil {
-		http.Error(w, "Failed to encode players", http.StatusInternalServerError)
-		return
-	}
-}
+//func (h *PlayerHandler) GetPlayerByID(w http.ResponseWriter, r *http.Request) error {
+//	vars := mux.Vars(r)
+//	id, err := strconv.Atoi(vars["id"])
+//	if err != nil {
+//		return errors.ErrBadRequest
+//	}
+//
+//	player, err := h.Service.GetPlayerByID(uint(id))
+//	if err != nil {
+//		return err
+//	}
+//
+//	return httprespond.JSON(w, http.StatusOK, player)
+//}
 
-func (h *PlayerHandler) GetPlayerByID(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		http.Error(w, "Invalid ID", http.StatusBadRequest)
-		return
-	}
+//func (h *PlayerHandler) GetPlayers(w http.ResponseWriter, r *http.Request) error {
+//	players := h.Service.GetAllPlayers()
+//	return httprespond.JSON(w, http.StatusOK, players)
+//}
 
-	player, errPlayer := h.Service.GetPlayerByID(uint(id))
-	if errPlayer != nil {
-		http.Error(w, "Player not found", http.StatusNotFound)
-		return
-	}
+//func (h *PlayerHandler) UpdatePlayer(w http.ResponseWriter, r *http.Request, p dto.PlayerDTO) error {
+//	vars := mux.Vars(r)
+//	id, err := strconv.Atoi(vars["id"])
+//	if err != nil {
+//		return errors.ErrBadRequest
+//	}
+//	var player models.Player
+//
+//	if err = h.Service.UpdatePlayer(p.ToDomain(), uint(id)); err != nil {
+//		return err
+//	}
+//	return httprespond.JSON(w, http.StatusOK, player)
+//}
 
-	errEncode := json.NewEncoder(w).Encode(player)
-	if errEncode != nil {
-		http.Error(w, "Failed to encode player", http.StatusInternalServerError)
-		return
-	}
-}
-
-func (h *PlayerHandler) UpdatePlayer(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		http.Error(w, "Invalid ID", http.StatusBadRequest)
-		return
-	}
-	var player models.Player
-
-	if err := json.NewDecoder(r.Body).Decode(&player); err != nil {
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
-		return
-	}
-	if err = h.Service.UpdatePlayer(player, uint(id)); err != nil {
-		http.Error(w, "Failed to update player", http.StatusInternalServerError)
-		return
-	}
-	errEncode := json.NewEncoder(w).Encode(player)
-	if errEncode != nil {
-		http.Error(w, "Failed to encode player", http.StatusInternalServerError)
-		return
-	}
-}
-
-func (h *PlayerHandler) DeletePlayer(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		http.Error(w, "Invalid ID", http.StatusBadRequest)
-		return
-	}
-
-	if err = h.Service.DeletePlayer(uint(id)); err != nil {
-		http.Error(w, "Failed to delete player", http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusNoContent)
-	fmt.Printf("✅ Player deleted successfully")
-}
+//func (h *PlayerHandler) DeletePlayer(w http.ResponseWriter, r *http.Request) error {
+//	vars := mux.Vars(r)
+//	id, err := strconv.Atoi(vars["id"])
+//	if err != nil {
+//		return errors.ErrBadRequest
+//	}
+//
+//	if err = h.Service.DeletePlayer(uint(id)); err != nil {
+//		return err
+//	}
+//	return httprespond.JSON(w, http.StatusNoContent, nil)
+//}

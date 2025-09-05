@@ -7,8 +7,6 @@ import (
 
 	"fut-app/pkg/logger"
 
-	"fut-app/internal/handlers/routes"
-
 	"github.com/gorilla/mux"
 
 	"fut-app/internal/database"
@@ -21,9 +19,9 @@ func main() {
 	})
 	slog.SetDefault(logger)
 	db := createDatabase()
-
+	d := InjectDependencies(db, logger)
 	r := mux.NewRouter()
-	routes.CreateRoutes(r, db, logger)
+	CreateRoutes(r, d)
 
 	slog.Info("🚀 Server is running on port 8080")
 	slog.Info("It's time ⚽ ⚽ ⚽ ⚽ ⚽ ⚽")
