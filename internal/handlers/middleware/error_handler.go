@@ -15,7 +15,7 @@ func (fn AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err := fn(w, r); err != nil {
 		logger := slog.Default()
 
-		var ve appErr.ValidationErrors
+		var ve *appErr.ValidationErrors
 		if errors.As(err, &ve) {
 			logger.Warn("validation failed",
 				slog.String("method", r.Method),
