@@ -23,7 +23,6 @@ func TestPlayer_Validate_Success(t *testing.T) {
 
 	// Act
 	err := player.Validate()
-
 	// Assert
 	if err != nil {
 		t.Errorf("Validate() error = %v, want nil", err)
@@ -209,7 +208,6 @@ func TestPlayer_Validate_ValidPlayerWithMultiplePositions(t *testing.T) {
 
 	// Act
 	err := player.Validate()
-
 	// Assert
 	if err != nil {
 		t.Errorf("Validate() error = %v, want nil", err)
@@ -233,7 +231,6 @@ func TestPlayer_Validate_ExactStatsCount(t *testing.T) {
 
 	// Act
 	err := player.Validate()
-
 	// Assert
 	if err != nil {
 		t.Errorf("Validate() error = %v, want nil", err)

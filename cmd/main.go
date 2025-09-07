@@ -4,16 +4,33 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"strings"
 
 	"fut-app/pkg/logger"
 
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 
 	"fut-app/internal/database"
 	"fut-app/internal/database/models"
 )
 
+func loadEnv() {
+	// Load .env files only for non-production environments.
+	env := strings.ToLower(strings.TrimSpace(os.Getenv("APP_ENV")))
+	if env == "" {
+		env = "local"
+	}
+
+	switch env {
+	case "local", "dev", "development", "stage", "staging", "test":
+		_ = godotenv.Load(".env")
+		_ = godotenv.Load(".env." + env)
+	}
+}
+
 func main() {
+	loadEnv()
 	logger := logger.NewLogger(logger.Config{
 		AppName: "fut-app",
 	})
