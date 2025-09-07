@@ -60,7 +60,6 @@ func TestRegisterPlayerUseCase_Execute_Success(t *testing.T) {
 
 	// Act
 	result, err := useCase.Execute(player)
-
 	// Assert
 	if err != nil {
 		t.Errorf("Execute() error = %v, want nil", err)
@@ -203,7 +202,6 @@ func TestRegisterPlayerUseCase_Execute_ValidPlayerWithMultiplePositions(t *testi
 
 	// Act
 	result, err := useCase.Execute(player)
-
 	// Assert
 	if err != nil {
 		t.Errorf("Execute() error = %v, want nil", err)

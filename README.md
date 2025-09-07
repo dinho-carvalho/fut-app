@@ -1,88 +1,125 @@
-# 📌 Projeto Futebol Stats
+# 📊 Fut-App - Sistema de Gestão de Jogadores de Futebol Amador
 
-Este projeto tem como objetivo gerenciar estatísticas de jogadores de futebol amador, permitindo a avaliação de desempenho com notas de 45 a 99.
+Uma aplicação web em Go para gerenciamento de estatísticas de jogadores de futebol amador, desenvolvida seguindo os princípios de Clean Architecture.
 
----
+## 🏗️ Arquitetura
 
-## 🚀 Como Rodar o Projeto do Zero
+O projeto utiliza **Clean Architecture** com as seguintes camadas:
+- **Domain**: Entidades e regras de negócio
+- **Use Cases**: Casos de uso da aplicação
+- **Handlers**: Camada de apresentação (HTTP)
+- **Database**: Acesso a dados com GORM
 
-### **1️⃣ Pré-requisitos**
-Antes de começar, você precisará ter instalado:
-- **Golang** (versão 1.20+)
-- **Docker** e **Docker Compose**
-- **PostgreSQL** (caso prefira rodar localmente sem Docker)
-- **Make** (opcional, para rodar comandos mais facilmente)
-- **gofumpt** (para manter o padrão de formatação do código)
-
-### **2️⃣ Configurar Projeto**
-Se estiver utilizando Docker, basta rodar:
-```sh
-make up
+### 📂 Estrutura do Projeto
 ```
-Ou, manualmente:
-```sh
+cmd/                    # Ponto de entrada da aplicação
+├── main.go            # Setup do servidor
+├── routes.go          # Definição das rotas HTTP
+└── app_dependencies.go # Container de injeção de dependência
+
+internal/
+├── database/          # Camada de dados
+│   ├── models/       # Modelos GORM (Player, Position, Match, Rating)
+│   └── repositories/ # Repositórios de acesso a dados
+├── domain/           # Entidades de negócio
+├── usecase/         # Casos de uso
+├── handlers/        # Handlers HTTP e DTOs
+└── services/        # Serviços da aplicação
+```
+
+## 🚀 Como Rodar
+
+### Pré-requisitos
+- **Go** 1.20+
+- **Docker** e **Docker Compose**
+- **Make** (opcional)
+
+### 1. Clonar e configurar
+```bash
+git clone <repository-url>
+cd fut-app
+```
+
+### 2. Subir banco de dados
+```bash
+make up
+# ou
 docker-compose up -d
 ```
-Se preferir rodar o PostgreSQL localmente:
-```sh
-docker run --name futebol-db -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=admin -e POSTGRES_DB=futebol_stats -p 5432:5432 -d postgres
-```
 
-E configure a conexão no `.env`.
-
-### **3️⃣ Configurar Variáveis de Ambiente**
-Crie um arquivo **`.env`** na raiz do projeto e adicione:
+### 3. Configurar ambiente
+Crie um arquivo `.env`:
 ```env
 DB_HOST=localhost
 DB_PORT=5432
 DB_USER=postgres
-DB_PASSWORD=yourpassword
+DB_PASSWORD=postgres
 DB_NAME=futebol_stats
 ```
 
-### **4️⃣ Instalar Dependências**
-```sh
+### 4. Instalar dependências
+```bash
 go mod tidy
 ```
 
-### **6️⃣ Rodar a Aplicação**
-```sh
-go ./cmd/run main.go
-```
-Ou, com Makefile:
-```sh
+### 5. Rodar aplicação
+```bash
 make run
+# ou
+go run cmd/main.go
 ```
 
-### **7️⃣ Testar API**
-Acesse `http://localhost:8080` para verificar se a API está rodando.
+A API estará disponível em `http://localhost:8080`
 
----
+## 🛠️ Comandos Disponíveis
 
-## 📌 Comandos Úteis
+| Comando | Descrição |
+|---------|-----------|
+| `make run` | Executa a aplicação |
+| `make test` | Roda todos os testes |
+| `make fmt` | Formata código com gofumpt |
+| `make up` | Inicia serviços Docker |
+| `make down` | Para serviços Docker |
+| `make clean` | Limpa cache e dependências |
+| `golangci-lint run` | Executa linter |
 
-### **🚀 Subir o app com docker**
-```sh
-make up
-```
-### **🛑 Para instância do docker**
-```sh
-make down
-```
-### **🧹 Limpar Dependências e Cache**
-```sh
-make clean
-```
-### **🔄 Rodar Tests**
-```sh
+## 📊 Modelo de Dados
+
+- **Player**: Jogador com nome, posições e estatísticas
+- **Position**: Posições de futebol
+- **Match**: Registros de partidas
+- **Rating**: Avaliações de jogadores (escala 45-99)
+
+## 🔗 Endpoints Disponíveis
+
+- `POST /players` - Cadastro de jogador
+- `GET /health` - Verificação de saúde da API
+
+## 🧪 Testes
+
+```bash
+# Todos os testes
 make test
-```
-### **📝 Formatar Código com gofumpt**
-```sh
-gofumpt -w .
+
+# Teste específico
+go test ./internal/usecase -run TestRegisterPlayer
+
+# Com coverage
+go test ./... -coverprofile=coverage.out
 ```
 
+## 📋 Qualidade de Código
+
+- **Linting**: golangci-lint com govet, errcheck, unused, typecheck
+- **Formatação**: gofumpt (mais rigoroso que gofmt)
+- **Validação**: Middleware de validação JSON
+- **Logging**: Logs estruturados com slog
+
+## 🐳 Docker
+
+O projeto inclui configuração Docker Compose com PostgreSQL. Para desenvolvimento local, também suporta SQLite para testes.
+
 ---
+
 ![Go CI/CD](https://github.com/dinho-carvalho/fut-app/workflows/Go%20CI%20CD/badge.svg)
-[![codecov](https://codecov.io/gh/dinho-carvalho/fut-app/branch/main/graph/badge.svg)](https://codecov.io/gh/dinho-carvalhho/fut-app)
----
+[![codecov](https://codecov.io/gh/dinho-carvalho/fut-app/branch/main/graph/badge.svg)](https://codecov.io/gh/dinho-carvalho/fut-app)
