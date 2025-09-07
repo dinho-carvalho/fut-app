@@ -1,3 +1,15 @@
-/internal/routes
-/internal/database
-/cmd
+# Coverage ignore patterns
+# Use this file to exclude files/directories from test coverage requirements
+# 
+# Examples:
+# /internal/database/config.go    - Exclude specific file
+# /cmd                           - Exclude entire directory  
+# /internal/routes               - Exclude routes (if just configuration)
+# **/migrations/**               - Exclude database migrations
+# **/*_mock.go                   - Exclude mock files
+# **/*_gen.go                    - Exclude generated files
+
+# Currently excluded paths:
+/cmd                           # Main application and dependency injection (configuration files)
+/internal/database/config.go   # Database configuration only
+/internal/database/connection.go # Database connection setup only
