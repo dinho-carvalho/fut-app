@@ -56,7 +56,7 @@ jobs:
           fi
 
       - name: Build the application
-        run: go build -v -o myapp ./cmd/main.go # Adjust the output name and path as needed
+        run: go build -v -o myapp ./cmd # Build the entire cmd package so all files are included
 
     # Optional: Upload build artifact
     # - name: Upload build artifact
