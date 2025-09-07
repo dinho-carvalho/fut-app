@@ -25,7 +25,7 @@ jobs:
 
       - name: Run unit tests and calculate coverage
         run: |
-          go test -v -coverprofile=coverage.out -covermode=atomic -tags=coverage ./internal/handlers/... ./internal/repositories/... ./internal/services/...
+          go test -v -coverprofile=coverage.out -covermode=atomic -tags=coverage ./internal/handlers/... ./internal/domain/... ./internal/database/repositories/... ./internal/usecase/...
           echo "Calculating total coverage..."
           # Calculate total coverage percentage from coverage.out
           COVERAGE=$(go tool cover -func=coverage.out | grep '^total:' | awk '{print $3}' | sed 's/%//')
