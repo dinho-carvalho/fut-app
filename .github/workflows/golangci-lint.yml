@@ -34,7 +34,7 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v4 # Using v4 for latest stable action
         with:
-          version: v2.3.0 # Explicitly use golangci-lint v2
+          version: latest # Use latest v2 version
           args: --timeout=5m
           # Optional: Enable if you want to ensure the action uses the .golangci.yml from the repo
           # config-file: .golangci.yml
