@@ -44,6 +44,8 @@ func (fn AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(status)
-		_ = json.NewEncoder(w).Encode(httpErr)
+		if encErr := json.NewEncoder(w).Encode(httpErr); encErr != nil {
+			logger.Error("failed to encode http error", slog.String("error", encErr.Error()))
+		}
 	}
 }

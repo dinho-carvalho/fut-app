@@ -17,12 +17,14 @@ var (
 
 func ValidateJSON[T any](next func(http.ResponseWriter, *http.Request, T) error) AppHandler {
 	registerCustom.Do(func() {
-		_ = validate.RegisterValidation("statslen", func(fl validator.FieldLevel) bool {
+		if err := validate.RegisterValidation("statslen", func(fl validator.FieldLevel) bool {
 			if m, ok := fl.Field().Interface().(map[string]interface{}); ok {
 				return len(m) == 6
 			}
 			return false
-		})
+		}); err != nil {
+			panic(err)
+		}
 	})
 
 	return func(w http.ResponseWriter, r *http.Request) error {

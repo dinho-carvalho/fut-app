@@ -24,8 +24,8 @@ func loadEnv() {
 
 	switch env {
 	case "local", "dev", "development", "stage", "staging", "test":
-		_ = godotenv.Load(".env")
-		_ = godotenv.Load(".env." + env)
+		_ = godotenv.Load(".env")        // ignore: file may not exist in non-local runs
+		_ = godotenv.Load(".env." + env) // ignore: specific env file may not exist
 	}
 }
 

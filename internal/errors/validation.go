@@ -13,7 +13,10 @@ type ValidationError struct {
 type ValidationErrors []ValidationError
 
 func (ve *ValidationErrors) Error() string {
-	out, _ := json.Marshal(ve) // útil para logs
+	out, err := json.Marshal(ve)
+	if err != nil {
+		return "validation failed: could not marshal validation errors"
+	}
 	return fmt.Sprintf("validation failed: %s", string(out))
 }
 

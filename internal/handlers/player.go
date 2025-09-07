@@ -11,17 +11,17 @@ import (
 )
 
 type PlayerHandler struct {
-	usecase.RegisterPlayerUseCase
+	useCase usecase.RegisterPlayerUseCase
 }
 
 func NewPlayerHandler(p usecase.RegisterPlayerUseCase) *PlayerHandler {
 	return &PlayerHandler{
-		RegisterPlayerUseCase: p,
+		useCase: p,
 	}
 }
 
 func (h *PlayerHandler) CreatePlayer(w http.ResponseWriter, r *http.Request, p dto.PlayerDTO) error {
-	newPlayer, err := h.RegisterPlayerUseCase.Execute(p.ToDomain())
+	newPlayer, err := h.useCase.Execute(p.ToDomain())
 	if err != nil {
 		return err
 	}
